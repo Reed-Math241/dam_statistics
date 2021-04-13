@@ -1,0 +1,7 @@
+---
+title: "Data Loading and wrangling"
+output:
+  pdf_document: default
+urlcolor: blue
+---
+
