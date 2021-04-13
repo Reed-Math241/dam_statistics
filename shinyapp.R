@@ -47,7 +47,7 @@ server <- function(input, output){
     })
     
     ggplot(test_dat(), aes(x = x, y = y, 
-                         color = .data[[purpose]])) +
+                         color = .data[[input$dam]])) +
       geom_point(size = 2)
   })
 }
