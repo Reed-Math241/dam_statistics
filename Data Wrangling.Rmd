@@ -9,12 +9,13 @@ urlcolor: blue
 library(rvest)
 library(tidyverse)
 library(readxl)
+library(janitor)
 ```
 
 Data scarping wikipedia
 ```{r}
 link <- read_html("https://en.wikipedia.org/wiki/List_of_dams_and_reservoirs_in_Maharashtra")
-ratetab <- html_node(link, 'table') %>%
+daminfo <- html_node(link, 'table') %>%
   html_table(fill = TRUE)
 ```
 
@@ -23,8 +24,12 @@ loading 2015 data
 ```{r}
 dam2015 <- read_excel("Data/2015.xlsx")
 
-dam2015 <- dam2015 %>%
-  mutate(Names )
+daminfo <- daminfo %>%
+  clean_names() %>%
+  mutate(name_of_dam = case_when(
+    name_of_dam == "Koyna" ~ "Koyana/Shivaji Sagar",
+    TRUE ~ name_of_dam
+  ) )
 ```
 
 
