@@ -73,4 +73,11 @@ dam2015fin <- left_join(dam2015, daminfo, by = c ("reservoir_name" = "name_of_da
 ```
 
 
+2015 wide format
+
+```{r}
+wide2015 <- dam2015fin %>%
+  select(-month, -day, -year) %>%
+  pivot_wider(names_from = date, values_from = value)
+```
 
