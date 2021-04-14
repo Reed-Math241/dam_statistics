@@ -8,6 +8,18 @@ test_dat <- data.frame(x = c(5, 2, 3),
                        dam = c("Hydroelectricity",
                                "Irrigation", "Water Supply"))
 
+dam2015fin %>%
+  drop_na() %>%
+  mutate(eff_sto_cap_106m3 = effective_storage_capacity_103m3/1000) %>%
+  group_by(reservoir_name) %>%
+    ggplot(aes(x = date, y = value, color = purpose,
+           size = eff_sto_cap_106m3)) +
+      geom_point(alpha = 0.6) +
+      theme_minimal() +
+      labs(y = bquote("Water storage"~(10^6~m^3)), color = "Usage",
+           size = bquote("Effective storage capacity"~(10^6~m^3))) +
+      theme(axis.title.x = element_blank())
+
 
 # User interface
 ui <- fluidPage(

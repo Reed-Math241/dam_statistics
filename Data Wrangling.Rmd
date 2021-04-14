@@ -69,7 +69,11 @@ daminfo <- daminfo %>%
     TRUE ~ name_of_dam
   ) )
 
-dam2015fin <- left_join(dam2015, daminfo, by = c ("reservoir_name" = "name_of_dam"))
+dam2015fin <- left_join(dam2015, daminfo, by = c ("reservoir_name" = "name_of_dam")) %>%
+  mutate(gross_storage_capacity_103m3 = as.numeric(gross_storage_capacity_103m3),
+         effective_storage_capacity_103m3 = as.numeric(effective_storage_capacity_103m3),
+         value = as.numeric(value)) %>%
+  select(-na)
 ```
 
 
