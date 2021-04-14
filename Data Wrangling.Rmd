@@ -15,7 +15,9 @@ library(lubridate)
 library(glue)
 ```
 
-Data scarping wikipedia
+
+Data scraping wikipedia
+
 ```{r}
 link <- read_html("https://en.wikipedia.org/wiki/List_of_dams_and_reservoirs_in_Maharashtra")
 daminfo <- html_node(link, 'table') %>%
@@ -24,14 +26,29 @@ daminfo <- html_node(link, 'table') %>%
 
 
 loading 2015 data
+
 ```{r}
-dam2015 <- read_excel("Data/2015.xlsx")%>%
+dam2015 <- read_excel("Data/2015.xlsx") %>%
   clean_names() %>%
   pivot_longer(cols = c(-reservoir_name, -district, -basin),
                names_to = "month") %>%
   mutate(day = 1) %>%
   separate(month, into = c("month", "year"), sep = "_") %>%
-  mutate(date = glue(day, month, year))
+  mutate(month = case_when(
+    month == "jan" ~ 1,
+    month == "feb" ~ 2,
+    month == "mar" ~ 3,
+    month == "apr" ~ 4,
+    month == "may" ~ 5,
+    month == "jun" ~ 6,
+    month == "jul" ~ 7,
+    month == "aug" ~ 8,
+    month == "sep" ~ 9,
+    month == "oct" ~ 10,
+    month == "nov" ~ 11,
+    month == "dec" ~ 12),
+    date = make_date(year, month, day)) %>%
+  select(reservoir_name, district, basin, date, value, month, day, year)
   
 
 daminfo <- daminfo %>%
