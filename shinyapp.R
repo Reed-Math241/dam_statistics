@@ -8,17 +8,13 @@ test_dat <- data.frame(x = c(5, 2, 3),
                        dam = c("Hydroelectricity",
                                "Irrigation", "Water Supply"))
 
-dam2015fin %>%
+dam2015fin2 <- dam2015fin %>%
   drop_na() %>%
-  mutate(eff_sto_cap_106m3 = effective_storage_capacity_103m3/1000) %>%
-  group_by(reservoir_name) %>%
-    ggplot(aes(x = date, y = value, color = purpose,
-           size = eff_sto_cap_106m3)) +
-      geom_point(alpha = 0.6) +
-      theme_minimal() +
-      labs(y = bquote("Water storage"~(10^6~m^3)), color = "Usage",
-           size = bquote("Effective storage capacity"~(10^6~m^3))) +
-      theme(axis.title.x = element_blank())
+  mutate(purpose = str_replace(purpose, "  ", " & "),
+         purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
 
 
 # User interface
@@ -26,13 +22,10 @@ ui <- fluidPage(
   titlePanel(title = "Dam dashboard"),
   sidebarLayout(
     sidebarPanel(
-      checkboxGroupInput(inputId = "purpose", 
-                         label = "Dam purpose", 
-                         choices = c("Hydroelectricity",
-                                     "Irrigation", "Water Supply"),
-                         selected = c("Hydroelectricity",
-                                      "Irrigation", "Water Supply")
-                         )),
+      checkboxGroupInput(inputId = "damtype",
+                         label = "Dam use",
+                         choices = levels(dam2015fin2$purpose),
+                         selected = levels(dam2015fin2$purpose))),
     
     mainPanel(
       plotOutput("plot")
@@ -43,22 +36,33 @@ ui <- fluidPage(
 
 # Server function
 server <- function(input, output){
+
   
-  test_dat2 <- reactive({
-    test_dat %>%
-      filter(dam %in% input$purpose)
+  dam2015react <- reactive({
+    dam2015fin2 %>%
+      mutate(eff_sto_cap_106m3 = effective_storage_capacity_103m3/1000) %>%
+      group_by(reservoir_name) %>%
+      filter(purpose %in% input$damtype)
   })
   
   
-  
   output$plot <- renderPlot({
-    
-    ggplot(test_dat2(), aes(x = x, y = y, 
-                            color = dam)) +
-      geom_point(size = 2) +
+  
+      ggplot(dam2015react(),
+             aes(x = date, y = value, color = purpose,
+                 size = eff_sto_cap_106m3)) +
+      geom_point(alpha = 0.6) +
+      theme_minimal() +
+      labs(y = bquote("Water storage"~(10^6~m^3)), color = "Use",
+           size = bquote("Effective storage capacity"~(10^6~m^3))) +
+      theme(axis.title.x = element_blank()) +
+      guides(color = guide_legend(order = 1),
+             size = guide_legend(order = 2)) +
       scale_color_manual(breaks = c("Hydroelectricity",
-                                    "Irrigation", "Water Supply"),
-                         values = c("#00ba38", "#c77cff", "#619cff"))
+                                    "Irrigation",
+                                    "Irrigation & Hydroelectricity",
+                                    "Irrigation & Water supply"),
+                         values = c("#f8766d", "#00bfc4", "#7cae00", "#c77cff"))
   })
 }
 
