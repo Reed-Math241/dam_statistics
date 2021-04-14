@@ -1,6 +1,7 @@
 #load libraries
 library(shiny)
 library(tidyverse)
+library(RColorBrewer)
 
 #generate data
 test_dat <- data.frame(x = c(5, 2, 3),
@@ -62,7 +63,7 @@ server <- function(input, output){
                                     "Irrigation",
                                     "Irrigation & Hydroelectricity",
                                     "Irrigation & Water supply"),
-                         values = c("#f8766d", "#00bfc4", "#7cae00", "#c77cff"))
+                         values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3"))
   })
 }
 
