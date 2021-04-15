@@ -152,13 +152,6 @@ biggerdata <- inner_join(bigdata, daminfo, by = c ("reservoir_name" = "name_of_d
   select(-na)
 
 
-
-
-unique(biggerdata$purpose)
-unique(daminfo$purpose)
-
-unique(biggerdata$reservoir_name)
-unique(daminfo$name_of_dam)
-unique(test$reservoir_name)
+write_csv(biggerdata, here("damdata.csv"))
 ```
 
