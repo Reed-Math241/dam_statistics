@@ -3,7 +3,6 @@ library(shiny)
 library(tidyverse)
 library(lubridate)
 library(leaflet)
-library(mosaic)
 library(here)
 
 #load data
