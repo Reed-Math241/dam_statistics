@@ -5,7 +5,7 @@ library(lubridate)
 library(RColorBrewer)
 library(leaflet)
 
-#wrangle data
+#wrangle data (TO BE REPLACED BY READING IN CSV)
 dam2015fin2 <- dam2015fin %>%
   drop_na() %>%
   mutate(purpose = str_replace(purpose, "  ", " & "),
@@ -15,12 +15,21 @@ dam2015fin2 <- dam2015fin %>%
                                           "Irrigation & Water supply")))
 
 
+leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
+  addTiles() %>%
+  setView(lat = 19.5, lng = 76.2, zoom = 5) %>%
+  setMaxBounds(lat1 = 10, lng1 = 62.2,
+               lat2 = 29, lng2 = 90.2)
+
+
 # User interface
 ui <- fluidPage(
   titlePanel(title = "Dam dashboard"),
   tabsetPanel(
     tabPanel("Map", 
-             mainPanel(leafletOutput("map"))
+             mainPanel(
+               textOutput("info"),
+               leafletOutput("map"))
              ),
     
     tabPanel("Plot", 
@@ -59,6 +68,21 @@ server <- function(input, output){
       filter(purpose %in% input$damtype, 
              date <= input$dates[2], date >= input$dates[1])
   })
+  
+  
+  output$info <- renderText({
+    "Maharashtran Dams"
+  })
+  
+  
+  output$map <- renderLeaflet({
+    leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
+      addTiles() %>%
+      setView(lat = 19.5, lng = 76.2, zoom = 5) %>%
+      setMaxBounds(lat1 = 10, lng1 = 62.2,
+                   lat2 = 29, lng2 = 90.2)
+  })
+  
   
   
   output$plot <- renderPlot({
