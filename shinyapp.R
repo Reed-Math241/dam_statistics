@@ -46,6 +46,11 @@ ui <- fluidPage(
                  h3("Water storage over time"),
                  plotOutput("plot"))
              )),
+    
+    tabPanel("Stats",
+             mainPanel(
+               p("This is where we will do our spatial stats.")
+             )),
              
     tabPanel("Info",
              mainPanel(
@@ -85,7 +90,7 @@ server <- function(input, output){
   
   
   output$dateinfo <- renderText({
-    "The data are at the monthly level and range from 2015-01-01 to 2020-12-01. 
+    "The data are at the monthly level and range from January 2015 to December 2020. 
     We recommend subsetting by year and/or dam use to avoid overplotting."
   })
   
