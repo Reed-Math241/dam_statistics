@@ -3,12 +3,7 @@ library(shiny)
 library(tidyverse)
 library(RColorBrewer)
 
-#generate data
-test_dat <- data.frame(x = c(5, 2, 3),
-                       y = c(7, 4, 6),
-                       dam = c("Hydroelectricity",
-                               "Irrigation", "Water Supply"))
-
+#wrangle data
 dam2015fin2 <- dam2015fin %>%
   drop_na() %>%
   mutate(purpose = str_replace(purpose, "  ", " & "),
