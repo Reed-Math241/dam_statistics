@@ -7,7 +7,11 @@ library(leaflet)
 library(here)
 
 #wrangle data (TO BE REPLACED BY READING IN CSV)
-damdata <- read_csv(here("damdata.csv"))
+damdata <- read_csv(here("damdata.csv")) %>%
+  mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
 
 
 leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
@@ -23,7 +27,7 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("Map", 
              mainPanel(
-               textOutput("info"),
+               textOutput("title"),
                leafletOutput("map"))
              ),
     
@@ -36,14 +40,15 @@ ui <- fluidPage(
                                     selected = levels(damdata$purpose)),
                  dateRangeInput(inputId = "dates",
                                 label = "Date range",
-                                start = as_date("2015-01-01"), end = as_date("2020-12-01"),
-                                min = as_date("2020-01-01"), max = as_date("2020-12-01"))),
+                                start = as_date("2015-01-01"), end = as_date("2015-12-01"),
+                                min = as_date("2015-01-01"), max = as_date("2020-12-01")),
+                 textOutput("dateinfo")),
                mainPanel(plotOutput("plot"))
              )),
              
-    tabPanel("Sources",
+    tabPanel("Info",
              mainPanel(
-               uiOutput("link"), uiOutput("link2")
+               uiOutput("credit"), uiOutput("link"), uiOutput("link2")
              )
     )
   )
@@ -63,7 +68,7 @@ server <- function(input, output){
   })
   
   
-  output$info <- renderText({
+  output$title <- renderText({
     "Maharashtra Dams"
   })
   
@@ -78,6 +83,11 @@ server <- function(input, output){
   
   
   
+  output$dateinfo <- renderText({
+    "The data are at the monthly level and range from 2015-01-01 to 2020-12-01. 
+    We recommend subsetting by year and/or dam use to avoid overplotting."
+  })
+  
   output$plot <- renderPlot({
   
       ggplot(damreact(),
@@ -86,8 +96,7 @@ server <- function(input, output){
       geom_point(alpha = 0.6) +
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
-           size = bquote("Effective storage capacity"~(10^9~m^3)),
-           caption = "Data are at the monthly level.") +
+           size = bquote("Effective storage capacity"~(10^9~m^3))) +
       theme(axis.title.x = element_blank()) +
       guides(color = guide_legend(order = 1),
              size = guide_legend(order = 2)) +
@@ -99,18 +108,27 @@ server <- function(input, output){
   })
 
   
+  output$credit <- renderUI({
+    auth <- "Authors:"
+    ad <- "Aditya Gadkari"
+    la <- "Lauren Rabe"
+    skip <- " "
+    sc <- "Sources:"
+    HTML(paste(auth, ad, la, skip, sc, sep = "</br>"))
+  })
+  
   
   output$link <- renderUI({
-    tags$a(href = "https://d1z8le3pdnub92.cloudfront.net/app/0.0.49/#/reports/important-dams", 
+    tags$a(href = "https://indiawris.gov.in/wris/#/", 
            target = "_blank", 
-           "Water Resources Department. Government of Maharashtra, India.")
+           "India Water Resources Information System")
   })
   
   
   output$link2 <- renderUI({
     tags$a(href="https://en.wikipedia.org/wiki/List_of_dams_and_reservoirs_in_Maharashtra", 
            target = "_blank",
-           "Wikipedia: List of dams and reservoirs in Maharashtra.")
+           "Wikipedia: List of dams and reservoirs in Maharashtra")
   })
 }
 
