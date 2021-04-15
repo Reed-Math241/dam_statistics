@@ -149,7 +149,12 @@ bigdata <- bind_rows(dam2015, dam2016, dam2017, dam2018, dam2019, dam2020)
 biggerdata <- inner_join(bigdata, daminfo, by = c ("reservoir_name" = "name_of_dam")) %>%
   mutate(gross_storage_capacity_109m3 = as.numeric(gross_storage_capacity_103m3)/1000000,
          effective_storage_capacity_109m3 = as.numeric(effective_storage_capacity_103m3)/1000000) %>%
-  select(-na)
+  select(-na) %>%
+  mutate(purpose = str_replace(purpose, "  ", " & "),
+         purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
 
 
 write_csv(biggerdata, here("damdata.csv"))

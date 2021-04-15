@@ -4,20 +4,15 @@ library(tidyverse)
 library(lubridate)
 library(RColorBrewer)
 library(leaflet)
+library(here)
 
 #wrangle data (TO BE REPLACED BY READING IN CSV)
-dam2015fin2 <- dam2015fin %>%
-  drop_na() %>%
-  mutate(purpose = str_replace(purpose, "  ", " & "),
-         purpose = fct_relevel(purpose, c("Hydroelectricity",
-                                          "Irrigation",
-                                          "Irrigation & Hydroelectricity",
-                                          "Irrigation & Water supply")))
+damdata <- read_csv(here("damdata.csv"))
 
 
 leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
   addTiles() %>%
-  setView(lat = 19.5, lng = 76.2, zoom = 5) %>%
+  setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
   setMaxBounds(lat1 = 10, lng1 = 62.2,
                lat2 = 29, lng2 = 90.2)
 
@@ -37,12 +32,12 @@ ui <- fluidPage(
                sidebarPanel(
                  checkboxGroupInput(inputId = "damtype",
                                     label = "Dam use",
-                                    choices = levels(dam2015fin2$purpose),
-                                    selected = levels(dam2015fin2$purpose)),
+                                    choices = levels(damdata$purpose),
+                                    selected = levels(damdata$purpose)),
                  dateRangeInput(inputId = "dates",
-                                label = "Select date range",
-                                start = as_date("2015-01-01"), end = as_date("2015-12-01"),
-                                min = as_date("2015-01-01"), max = as_date("2015-12-01"))),
+                                label = "Date range",
+                                start = as_date("2015-01-01"), end = as_date("2020-12-01"),
+                                min = as_date("2020-01-01"), max = as_date("2020-12-01"))),
                mainPanel(plotOutput("plot"))
              )),
              
@@ -61,24 +56,22 @@ ui <- fluidPage(
 server <- function(input, output){
 
   
-  dam2015react <- reactive({
-    dam2015fin2 %>%
-      mutate(eff_sto_cap_109m3 = effective_storage_capacity_103m3/1000000) %>%
-      group_by(reservoir_name) %>%
+  damreact <- reactive({
+    damdata %>%
       filter(purpose %in% input$damtype, 
              date <= input$dates[2], date >= input$dates[1])
   })
   
   
   output$info <- renderText({
-    "Maharashtran Dams"
+    "Maharashtra Dams"
   })
   
   
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
       addTiles() %>%
-      setView(lat = 19.5, lng = 76.2, zoom = 5) %>%
+      setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
                    lat2 = 29, lng2 = 90.2)
   })
@@ -87,9 +80,9 @@ server <- function(input, output){
   
   output$plot <- renderPlot({
   
-      ggplot(dam2015react(),
-             aes(x = date, y = value, color = purpose,
-                 size = eff_sto_cap_109m3)) +
+      ggplot(damreact(),
+             aes(x = date, y = storage_bcm, color = purpose,
+                 size = effective_storage_capacity_109m3)) +
       geom_point(alpha = 0.6) +
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
