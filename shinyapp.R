@@ -3,10 +3,10 @@ library(shiny)
 library(tidyverse)
 library(lubridate)
 library(leaflet)
+library(mosaic)
 library(here)
-library(plotly)
 
-#wrangle data (TO BE REPLACED BY READING IN CSV)
+#load data
 damdata <- read_csv(here("damdata.csv")) %>%
   mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
                                           "Irrigation",
@@ -21,16 +21,6 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   setMaxBounds(lat1 = 10, lng1 = 62.2,
                lat2 = 29, lng2 = 90.2)
 
-plot_ly(type = 'scatter',
-        mode = "markers",
-        data = damdata, 
-        x = ~date, y = ~storage_bcm, color = ~purpose,
-        marker = list(size = ~effective_storage_capacity_109m3),
-        text = ~reservoir_name, hoverinfo = "text") %>%
-  layout(scene = list(xaxis = list(title = "Date"), 
-                      yaxis = list(title = "Water Storage (BCM)")))
-  
-  
 
 
 # User interface
