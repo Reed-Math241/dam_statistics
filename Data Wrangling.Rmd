@@ -47,7 +47,8 @@ dam2015 <- read_excel("Data/2015.xlsx") %>%
     month == "oct" ~ 10,
     month == "nov" ~ 11,
     month == "dec" ~ 12),
-    date = make_date(year, month, day)) %>%
+    date = make_date(year, month, day),
+    storage_bcm = as.numeric(value)) %>%
   select(reservoir_name, district, basin, date, value, month, day, year)
   
 
@@ -93,5 +94,71 @@ dam2015fin2 <- dam2015fin %>%
 wide2015 <- dam2015fin %>%
   select(-month, -day, -year) %>%
   pivot_wider(names_from = date, values_from = value)
+```
+
+
+```{r}
+cruncher<- function(data){
+  read_excel(data, col_types = c("text", 
+    "text", "text", "text", "text", 
+    "text", "text", "text", "text", 
+    "text", "text", "text", "text", 
+    "text", "text")) %>%
+  clean_names() %>%
+  pivot_longer(cols = c(-reservoir_name, -district, -basin),
+               names_to = "month") %>%
+  mutate(day = 1) %>%
+  separate(month, into = c("month", "year"), sep = "_") %>%
+  mutate(month = case_when(
+    month == "jan" ~ 1,
+    month == "feb" ~ 2,
+    month == "mar" ~ 3,
+    month == "apr" ~ 4,
+    month == "may" ~ 5,
+    month == "jun" ~ 6,
+    month == "jul" ~ 7,
+    month == "aug" ~ 8,
+    month == "sep" ~ 9,
+    month == "oct" ~ 10,
+    month == "nov" ~ 11,
+    month == "dec" ~ 12),
+    date = make_date(year, month, day),
+    storage_bcm = as.numeric(value)) %>%
+  select(reservoir_name, district, basin, date, storage_bcm, month, day, year)
+}
+
+year <- 2015:2020 
+dataglue <- glue("Data/{year}.xlsx")
+dataname <- glue("dam{year}")
+
+
+dam2015 <- cruncher("Data/2015.xlsx")
+dam2016 <- cruncher("Data/2016.xlsx")
+dam2017 <- cruncher("Data/2017.xlsx")
+dam2018 <- cruncher("Data/2018.xlsx")
+dam2019 <- cruncher("Data/2019.xlsx")
+dam2020 <- cruncher("Data/2020.xlsx")
+
+
+# for(i in 1:length(dataglue)){
+#   dataname[i] <- cruncher(dataglue[i])
+# }
+
+bigdata <- bind_rows(dam2015, dam2016, dam2017, dam2018, dam2019, dam2020)
+
+biggerdata <- inner_join(bigdata, daminfo, by = c ("reservoir_name" = "name_of_dam")) %>%
+  mutate(gross_storage_capacity_109m3 = as.numeric(gross_storage_capacity_103m3)/1000000,
+         effective_storage_capacity_109m3 = as.numeric(effective_storage_capacity_103m3)/1000000) %>%
+  select(-na)
+
+
+
+
+unique(biggerdata$purpose)
+unique(daminfo$purpose)
+
+unique(biggerdata$reservoir_name)
+unique(daminfo$name_of_dam)
+unique(test$reservoir_name)
 ```
 
