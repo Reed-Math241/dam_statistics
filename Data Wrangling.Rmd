@@ -74,6 +74,16 @@ dam2015fin <- left_join(dam2015, daminfo, by = c ("reservoir_name" = "name_of_da
          effective_storage_capacity_103m3 = as.numeric(effective_storage_capacity_103m3),
          value = as.numeric(value)) %>%
   select(-na)
+
+
+#make factors for graph
+dam2015fin2 <- dam2015fin %>%
+  drop_na() %>%
+  mutate(purpose = str_replace(purpose, "  ", " & "),
+         purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
 ```
 
 
