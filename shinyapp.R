@@ -2,7 +2,6 @@
 library(shiny)
 library(tidyverse)
 library(lubridate)
-library(RColorBrewer)
 library(leaflet)
 library(here)
 
@@ -43,7 +42,9 @@ ui <- fluidPage(
                                 start = as_date("2015-01-01"), end = as_date("2015-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
                  textOutput("dateinfo")),
-               mainPanel(plotOutput("plot"))
+               mainPanel(
+                 h3("Water storage over time"),
+                 plotOutput("plot"))
              )),
              
     tabPanel("Info",
@@ -87,6 +88,8 @@ server <- function(input, output){
     "The data are at the monthly level and range from 2015-01-01 to 2020-12-01. 
     We recommend subsetting by year and/or dam use to avoid overplotting."
   })
+  
+
   
   output$plot <- renderPlot({
   
