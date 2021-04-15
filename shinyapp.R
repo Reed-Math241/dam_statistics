@@ -4,6 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(leaflet)
 library(here)
+library(plotly)
 
 #wrangle data (TO BE REPLACED BY READING IN CSV)
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -13,11 +14,23 @@ damdata <- read_csv(here("damdata.csv")) %>%
                                           "Irrigation & Water supply")))
 
 
-leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
+#testing out plots
+leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addTiles() %>%
   setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
   setMaxBounds(lat1 = 10, lng1 = 62.2,
                lat2 = 29, lng2 = 90.2)
+
+plot_ly(type = 'scatter',
+        mode = "markers",
+        data = damdata, 
+        x = ~date, y = ~storage_bcm, color = ~purpose,
+        marker = list(size = ~effective_storage_capacity_109m3),
+        text = ~reservoir_name, hoverinfo = "text") %>%
+  layout(scene = list(xaxis = list(title = "Date"), 
+                      yaxis = list(title = "Water Storage (BCM)")))
+  
+  
 
 
 # User interface
@@ -80,7 +93,7 @@ server <- function(input, output){
   
   
   output$map <- renderLeaflet({
-    leaflet(options = leafletOptions(minZoom = 4, maxZoom = 9)) %>%
+    leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
       addTiles() %>%
       setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
