@@ -1,0 +1,6 @@
+---
+title: "Spatial Analysis"
+output:
+  pdf_document: default
+urlcolor: blue
+---
