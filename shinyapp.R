@@ -12,13 +12,29 @@ damdata <- read_csv(here("damdata.csv")) %>%
                                           "Irrigation & Hydroelectricity",
                                           "Irrigation & Water supply")))
 
+damspat <- read_csv(here("damspats.csv")) %>%
+  mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
+
 
 #testing out plots
+content <- paste("<b>", damspat$reservoir_name, "</b></br>",
+                 "River:", damspat$river, "</br>",
+                 "Purpose:", damspat$purpose, "</br>",
+                 "Effective storage capacity:", damspat$effect_sto_cap_bcm, "BCM")
+
+
 leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addTiles() %>%
-  setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
+  setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
   setMaxBounds(lat1 = 10, lng1 = 62.2,
-               lat2 = 29, lng2 = 90.2)
+               lat2 = 29, lng2 = 90.2) %>%
+  addCircleMarkers(data = damspat,
+                   lat = ~lat, lng = ~long,
+                   stroke = FALSE, fillOpacity = 0.65,
+                   radius = ~effect_sto_cap_bcm*10, popup = content)
 
 
 
@@ -84,9 +100,13 @@ server <- function(input, output){
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
       addTiles() %>%
-      setView(lat = 19.35, lng = 76.2, zoom = 6) %>%
+      setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
-                   lat2 = 29, lng2 = 90.2)
+                   lat2 = 29, lng2 = 90.2) %>%
+      addCircleMarkers(data = damspat,
+                       lat = ~lat, lng = ~long,
+                       stroke = FALSE, fillOpacity = 0.65,
+                       radius = ~effect_sto_cap_bcm*10, popup = content)
   })
   
   
