@@ -5,6 +5,7 @@ library(lubridate)
 library(leaflet)
 library(here)
 library(leaflet.extras)
+library(shinyWidgets)
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -17,14 +18,15 @@ damspat <- read_csv(here("damspats.csv")) %>%
   mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
                                           "Irrigation",
                                           "Irrigation & Hydroelectricity",
-                                          "Irrigation & Water supply")))
+                                          "Irrigation & Water supply")),
+         district = as_factor(district))
 
 
 #testing out plots
 content <- paste("<b>", damspat$reservoir_name, "</b></br>",
                  "River:", damspat$river, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
-                 "Effective storage capacity:", damspat$effect_sto_cap_bcm, "BCM")
+                 "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
 
 leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
@@ -35,7 +37,7 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addCircleMarkers(data = damspat,
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
-                   radius = ~effect_sto_cap_bcm*10, popup = content)
+                   radius = ~effective_storage_capacity_109m3*10, popup = content)
 
 
 
@@ -52,15 +54,38 @@ ui <- fluidPage(
     tabPanel("Plot", 
              sidebarLayout(
                sidebarPanel(
+                 
                  checkboxGroupInput(inputId = "damtype",
                                     label = "Dam use",
                                     choices = levels(damdata$purpose),
                                     selected = levels(damdata$purpose)),
+                 
+                 # pickerInput(inputId = "damtype2",
+                 #             label = "Dam use",
+                 #             choices = levels(damdata$purpose),
+                 #             selected = levels(damdata$purpose),
+                 #             options = list(`actions-box` = TRUE,
+                 #                            size = 10,
+                 #                            `selected-text-format` = "count > 3"),
+                 #             multiple = TRUE),
+                 
+                 # pickerInput(inputId = "damdist",
+                 #             label = "District",
+                 #             choices = levels(damspat$district),
+                 #             selected = levels(damspat$district),
+                 #             options = list(`actions-box` = TRUE,
+                 #                            size = 10,
+                 #                            `selected-text-format` = "count > 3"
+                 #                            ),
+                 #             multiple = TRUE),
+                 
                  dateRangeInput(inputId = "dates",
                                 label = "Date range",
                                 start = as_date("2015-01-01"), end = as_date("2015-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
+                 
                  textOutput("dateinfo")),
+               
                mainPanel(
                  h3("Water storage over time"),
                  plotOutput("plot"))
@@ -84,6 +109,7 @@ server <- function(input, output){
   damreact <- reactive({
     damdata %>%
       filter(purpose %in% input$damtype, 
+#             district %in% input$damdist,
              date <= input$dates[2], date >= input$dates[1])
   })
   
@@ -102,7 +128,8 @@ server <- function(input, output){
       addCircleMarkers(data = damspat,
                        lat = ~lat, lng = ~long,
                        stroke = FALSE, fillOpacity = 0.65,
-                       radius = ~effect_sto_cap_bcm*10, popup = content)
+                       radius = ~effective_storage_capacity_109m3*10, 
+                       popup = content)
   })
   
   

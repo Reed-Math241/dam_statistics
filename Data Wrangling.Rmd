@@ -169,11 +169,11 @@ sum(is.na(biggerdata$lat))
 sum(is.na(biggerdata$long))
 
 dam_spat <- biggerdata %>%
-  select(-c(date, month, day, year, storage_bcm, x)) %>%
+  select(-c(date, month, day, year,  x)) %>%
   distinct(reservoir_name, .keep_all = TRUE) %>%
   mutate(gross_storage_capacity_103m3 = as.numeric(gross_storage_capacity_103m3),
          effective_storage_capacity_103m3 = as.numeric(effective_storage_capacity_103m3),
-         effect_sto_cap_bcm = effective_storage_capacity_103m3/1000000)
+         district = str_to_title(district))
 
 write_csv(biggerdata, here("damdata.csv"))
 write_csv(dam_spat, here("damspats.csv"))
