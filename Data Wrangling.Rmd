@@ -168,6 +168,13 @@ biggerdata <- left_join(biggerdata, dam_locations,
 sum(is.na(biggerdata$lat))
 sum(is.na(biggerdata$long))
 
+dam_spat <- read_excel("Data/dam_locations.xlsx", 
+    col_names = FALSE) %>%
+  rename(dam = ...1,
+         lat = ...2,
+         long = ...3)
+
 write_csv(biggerdata, here("damdata.csv"))
+write_csv(dam_spat, here("damspats.csv"))
 ```
 
