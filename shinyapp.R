@@ -4,6 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(leaflet)
 library(here)
+library(leaflet.extras)
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -27,7 +28,7 @@ content <- paste("<b>", damspat$reservoir_name, "</b></br>",
 
 
 leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
-  addTiles() %>%
+  addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
   setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
   setMaxBounds(lat1 = 10, lng1 = 62.2,
                lat2 = 29, lng2 = 90.2) %>%
@@ -64,12 +65,7 @@ ui <- fluidPage(
                  h3("Water storage over time"),
                  plotOutput("plot"))
              )),
-    
-    tabPanel("Stats",
-             mainPanel(
-               p("This is where we will do our spatial stats.")
-             )),
-             
+
     tabPanel("Info",
              mainPanel(
                uiOutput("credit"), uiOutput("link"), uiOutput("link2")
@@ -100,7 +96,7 @@ server <- function(input, output){
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
       addTiles() %>%
-      setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
+      setView(lat = 19.1, lng = 75.8, zoom = 7) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
                    lat2 = 29, lng2 = 90.2) %>%
       addCircleMarkers(data = damspat,
