@@ -39,6 +39,25 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
                    stroke = FALSE, fillOpacity = 0.65,
                    radius = ~effective_storage_capacity_109m3*10, popup = content)
 
+grapher <- function(damname) {
+  data %>%
+    filter(date >= dmy(01012019),
+           reservoir_name == unique(damname)) %>%
+    ggplot(aes(x = date, y = storage_bcm)) +
+    geom_point(alpha = 0.8, 
+               fill = "#1BC0C2",
+               shape = 21,
+               size = 3) +
+    geom_line()+
+    labs(title = "Dam storage in 2019-2020",
+         x = "Date",
+         y = "Water Storage in BCM") +
+    theme_minimal()
+}
+
+
+maps <- map(unique(damspat$reservoir_name), grapher)
+
 
 
 # User interface
@@ -69,15 +88,15 @@ ui <- fluidPage(
                  #                            `selected-text-format` = "count > 3"),
                  #             multiple = TRUE),
                  
-                 # pickerInput(inputId = "damdist",
-                 #             label = "District",
-                 #             choices = levels(damspat$district),
-                 #             selected = levels(damspat$district),
-                 #             options = list(`actions-box` = TRUE,
-                 #                            size = 10,
-                 #                            `selected-text-format` = "count > 3"
-                 #                            ),
-                 #             multiple = TRUE),
+                 pickerInput(inputId = "damdist",
+                             label = "District",
+                             choices = levels(damspat$district),
+                             selected = levels(damspat$district),
+                             options = list(`actions-box` = TRUE,
+                                            size = 10,
+                                            `selected-text-format` = "count > 3"
+                                            ),
+                             multiple = TRUE),
                  
                  dateRangeInput(inputId = "dates",
                                 label = "Date range",
@@ -109,7 +128,7 @@ server <- function(input, output){
   damreact <- reactive({
     damdata %>%
       filter(purpose %in% input$damtype, 
-#             district %in% input$damdist,
+            district %in% input$damdist,
              date <= input$dates[2], date >= input$dates[1])
   })
   
@@ -128,8 +147,12 @@ server <- function(input, output){
       addCircleMarkers(data = damspat,
                        lat = ~lat, lng = ~long,
                        stroke = FALSE, fillOpacity = 0.65,
-                       radius = ~effective_storage_capacity_109m3*10, 
-                       popup = content)
+                       radius = ~effective_storage_capacity_109m3*10,
+                       group = "dams",
+                       label = unique(damspat$reservoir_name)) %>%
+      addPopupGraphs(maps, group = "dams", width = 400, height = 300)
+    
+      
   })
   
   

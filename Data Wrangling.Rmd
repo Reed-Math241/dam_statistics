@@ -179,3 +179,27 @@ write_csv(biggerdata, here("damdata.csv"))
 write_csv(dam_spat, here("damspats.csv"))
 ```
 
+
+playing around with the plot
+
+```{r}
+
+data %>%
+  filter(purpose == "Irrigation & Hydroelectricity") %>%
+  ggplot(aes(x = date, y = storage_bcm, color = purpose,
+             group = reservoir_name)) +
+      geom_point(alpha = 0.6, aes(size = effective_storage_capacity_109m3))+
+      geom_line(color = "black", alpha = 0.5)+
+      theme_minimal() +
+      labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
+           size = bquote("Effective storage capacity"~(10^9~m^3))) +
+      theme(axis.title.x = element_blank()) +
+      guides(color = guide_legend(order = 1),
+             size = guide_legend(order = 2)) +
+      scale_color_manual(breaks = c("Hydroelectricity",
+                                    "Irrigation",
+                                    "Irrigation & Hydroelectricity",
+                                    "Irrigation & Water supply"),
+                         values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3"))
+```
+
