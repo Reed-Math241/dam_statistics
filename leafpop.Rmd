@@ -1,0 +1,60 @@
+---
+title: "leafpop"
+output: pdf_document
+---
+
+loading data and libraries
+```{r}
+library(tidyverse)
+#install.packages("leafpop")
+library(leafpop)
+library(lubridate)
+library(leaflet)
+data <- read_csv("damdata.csv")
+damspat <- read_csv("damspats.csv")
+```
+Starting leafpop graphs 
+
+```{r}
+  
+grapher <- function(damname) {
+  data %>%
+  filter(date >= dmy(01012019),
+         reservoir_name == unique(damname)) %>%
+  ggplot(aes(x = date, y = storage_bcm)) +
+  geom_point(alpha = 0.8, 
+             fill = "#1BC0C2",
+             shape = 21,
+             size = 3) +
+  geom_line()+
+  labs(title = "Dam storage in 2019-2020",
+       x = "Date",
+       y = "Storage in BCM") +
+  theme_minimal()
+}
+
+
+
+grapher(unique(damspat$reservoir_name[4]))
+
+
+
+
+
+
+
+
+leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
+  addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
+  setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
+  setMaxBounds(lat1 = 10, lng1 = 62.2,
+               lat2 = 29, lng2 = 90.2) %>%
+  addCircleMarkers(data = damspat,
+                   lat = ~lat, lng = ~long,
+                   stroke = FALSE, fillOpacity = 0.65,
+                   radius = ~effective_storage_capacity_109m3*10,
+                   group = "dams") %>%
+  addPopupGraphs(list(damgraph), group = "dams", width = 300, height = 400)
+
+```
+
