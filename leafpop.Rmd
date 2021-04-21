@@ -112,10 +112,10 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
                    radius = ~effective_storage_capacity_109m3*10,
-                   group = "Information",
+                   group = "Text.Info",
                    label = unique(damspat$reservoir_name),
                    popup = content) %>%
-  addLayersControl(baseGroups = c("Water.Depletion", "Information"),
+  addLayersControl(baseGroups = c("Water.Depletion", "Text.Info"),
                    options = layersControlOptions(collapsed = FALSE),
                    position = "topright") %>%
     htmlwidgets::onRender("
