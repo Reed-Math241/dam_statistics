@@ -76,7 +76,7 @@ ui <- fluidPage(
                  
                  dateRangeInput(inputId = "dates",
                                 label = "Date range",
-                                start = as_date("2015-01-01"), end = as_date("2015-12-01"),
+                                start = as_date("2015-01-01"), end = as_date("2016-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
                  
                  textOutput("dateinfo")),
@@ -143,10 +143,10 @@ server <- function(input, output){
   output$plot <- renderPlot({
   
       ggplot(damreact(),
-             aes(x = date, y = storage_bcm, color = purpose)) +
+             aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name)) +
       geom_point(alpha = 0.6,
-                 size = damreact()$effective_storage_capacity_109m3) +
- #     geom_line(alpha = 0.6, group = damreact()$reservoir_name) +
+                 size = damreact()$effective_storage_capacity_109m3*2) +
+      geom_line(alpha = 0.2, color = "black") +
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
            size = bquote("Effective storage capacity"~(10^9~m^3))) +
