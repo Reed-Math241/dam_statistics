@@ -7,6 +7,8 @@ library(here)
 library(leaflet.extras)
 library(shinyWidgets)
 library(leafpop)
+library(shinydashboard)
+
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -29,91 +31,99 @@ load(here("popmaps.RData")) #this is called "maps" in the environment
 #create static pieces
 content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
                  "River:", damspat$river, "</br>",
-                 "District", damspat$district, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
 
 
-# User interface
-ui <- fluidPage(
-  titlePanel(title = "Dam daniel"),
-  tabsetPanel(
-    tabPanel("Map", 
-             
-             sidebarLayout(
-               position = "right",
-               sidebarPanel(
-                 p("Here is where we will give context about the dams",
-                               "and monsoons.")
-               ),
-             
-               mainPanel(
-                 textOutput("title"),
-                 leafletOutput("map"))
-             
-             )
-             ),
-    
-    tabPanel("Plot", 
-             sidebarLayout(
-               sidebarPanel(
-                 
-                 checkboxGroupInput(inputId = "damtype",
-                                    label = "Dam use",
-                                    choices = levels(damdata$purpose),
-                                    selected = levels(damdata$purpose)),
-                 
-                 pickerInput(inputId = "damdist",
-                             label = "District",
-                             choices = unique(damdata$district),
-                             selected = unique(damdata$district),
-                             options = list(`actions-box` = TRUE,
-                                            size = 10,
-                                            `selected-text-format` = "count > 3"
-                                            ),
-                             multiple = TRUE),
-                 
-                 dateRangeInput(inputId = "dates",
-                                label = "Date range",
-                                start = as_date("2015-01-01"), end = as_date("2016-12-01"),
-                                min = as_date("2015-01-01"), max = as_date("2020-12-01")),
-                 
-                 textOutput("dateinfo")),
-               
-               mainPanel(
-                 h3("Water storage over time"),
-                 plotOutput("plot"))
-             )),
 
-    tabPanel("Info",
-             mainPanel(
-               uiOutput("credit"), uiOutput("link"), uiOutput("link2")
-             )
+
+#CREATE UI
+ui <- dashboardPage(
+  dashboardHeader(title = "Dam dashboard"),
+
+  
+#sidebar
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Map", tabName = "maptab", icon = icon("dashboard")),
+      menuItem("Plot", tabName = "plottab", icon = icon("th")),
+      menuItem("Info", tabName = "infotab", icon = icon("th"))
+    )
+  ),
+  
+
+#body
+  dashboardBody(
+    tabItems(
+
+  #map tab      
+      tabItem(tabName = "maptab",
+        fluidPage(
+          
+          box(
+            title = "Maharashtra Dams",
+            leafletOutput("map", height = 500, width = 700)
+            )
+          )
+      ),
+      
+      
+  #plot tab
+      tabItem(tabName = "plottab",
+        fluidRow(
+
+    #the inputs for the plot 
+          box(width = 3,
+            checkboxGroupInput(inputId = "damtype",
+                               label = "Dam use",
+                               choices = levels(damdata$purpose),
+                               selected = levels(damdata$purpose)),
+            
+            pickerInput(inputId = "damdist",
+                        label = "District",
+                        choices = unique(damdata$district),
+                        selected = unique(damdata$district),
+                        options = list(`actions-box` = TRUE,
+                                       size = 10,
+                                       `selected-text-format` = "count > 3"
+                        ),
+                        multiple = TRUE),
+            
+            dateRangeInput(inputId = "dates",
+                           label = "Date range",
+                           start = as_date("2015-01-01"), end = as_date("2016-12-01"),
+                           min = as_date("2015-01-01"), max = as_date("2020-12-01")),
+            
+            textOutput("dateinfo")
+          ),
+                    
+    #the actual plot
+          box(width = 6,
+            title = h3("Water storage over time"),
+            plotOutput("plot", width = 600)
+            )
+          )
+      ),
+      
+
+  #info tab
+      tabItem(tabName = "infotab",
+              uiOutput("credit"), uiOutput("link"), uiOutput("link2")
+        
+      )
     )
   )
 )
 
-    
-    
-    
-# Server function
-server <- function(input, output){
 
-  
-  damreact <- reactive({
-    damdata %>%
-      filter(purpose %in% input$damtype, 
-             district %in% input$damdist,
-             date <= input$dates[2], date >= input$dates[1])
-  })
+
+#create server function
+server <- function(input, output) {
   
   
-  output$title <- renderText({
-    "Maharashtra Dams"
-  })
   
-  
+  #map
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
       addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
@@ -143,22 +153,24 @@ server <- function(input, output){
         }
     ")
     
-      
+    
   })
   
   
+  #plot
   
-  output$dateinfo <- renderText({
-    "The data are at the monthly level and range from January 2015 to December 2020. 
-    We recommend subsetting the data to avoid overplotting."
+  damreact <- reactive({
+    damdata %>%
+      filter(purpose %in% input$damtype, 
+             district %in% input$damdist,
+             date <= input$dates[2], date >= input$dates[1])
   })
   
-
   
   output$plot <- renderPlot({
-  
-      ggplot(damreact(),
-             aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name)) +
+    
+    ggplot(damreact(),
+           aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name)) +
       geom_point(alpha = 0.6,
                  size = damreact()$effective_storage_capacity_109m3*2) +
       geom_line(alpha = 0.2, color = "black") +
@@ -174,7 +186,16 @@ server <- function(input, output){
                                     "Irrigation & Water supply"),
                          values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3"))
   })
-
+  
+  
+  output$dateinfo <- renderText({
+    "The data are at the monthly level and range from January 2015 to December 2020. 
+    We recommend subsetting the data to avoid overplotting."
+  })
+  
+  
+  
+  #credits
   
   output$credit <- renderUI({
     auth <- "Authors:"
@@ -198,8 +219,10 @@ server <- function(input, output){
            target = "_blank",
            "Wikipedia: List of dams and reservoirs in Maharashtra")
   })
+  
+  
 }
 
 
-# Creates app
-shinyApp(ui = ui, server = server)
+#create dashboard
+shinyApp(ui, server)
