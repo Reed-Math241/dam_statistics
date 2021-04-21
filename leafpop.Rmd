@@ -11,6 +11,7 @@ library(leafpop)
 library(lubridate)
 library(leaflet)
 library(here)
+library(htmlwidgets)
 ```
 
 ```{r}
@@ -66,6 +67,7 @@ maps <- map(unique(damspat$reservoir_name), grapher)
 ```{r}
 content <- paste("<b>", damspat$reservoir_name, "</b></br>",
                  "River:", damspat$river, "</br>",
+                 "District", damspat$district, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
@@ -88,5 +90,38 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
 
 ```{r}
 save(maps, file = here("popmaps.RData"))
+```
+
+
+trying to do multiple popups
+
+```{r}
+leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
+  addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
+  setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
+  setMaxBounds(lat1 = 10, lng1 = 62.2,
+               lat2 = 29, lng2 = 90.2) %>%
+  addCircleMarkers(data = damspat,
+                   lat = ~lat, lng = ~long,
+                   stroke = FALSE, fillOpacity = 0.65,
+                   radius = ~effective_storage_capacity_109m3*10,
+                   group = "Water.Depletion",
+                   label = unique(damspat$reservoir_name)) %>%
+  addPopupGraphs(maps, group = "Water.Depletion", width = 400, height = 300) %>%
+  addCircleMarkers(data = damspat,
+                   lat = ~lat, lng = ~long,
+                   stroke = FALSE, fillOpacity = 0.65,
+                   radius = ~effective_storage_capacity_109m3*10,
+                   group = "Information",
+                   label = unique(damspat$reservoir_name),
+                   popup = content) %>%
+  addLayersControl(baseGroups = c("Water.Depletion", "Information"),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = "topright") %>%
+    htmlwidgets::onRender("
+        function() {
+            $('.leaflet-control-layers-list').prepend('<label style=\"text-align:center\"><u><b>Toggle Popups</b></u></label>');
+        }
+    ")
 ```
 

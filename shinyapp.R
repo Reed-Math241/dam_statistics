@@ -27,7 +27,7 @@ load(here("popmaps.RData")) #this is called "maps" in the environment
 
 
 #create static pieces
-content <- paste("<b>", damspat$reservoir_name, "</b></br>",
+content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
                  "River:", damspat$river, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
@@ -116,17 +116,32 @@ server <- function(input, output){
   
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
-      addTiles() %>%
-      setView(lat = 19.1, lng = 75.8, zoom = 7) %>%
+      addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
+      setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
                    lat2 = 29, lng2 = 90.2) %>%
       addCircleMarkers(data = damspat,
                        lat = ~lat, lng = ~long,
                        stroke = FALSE, fillOpacity = 0.65,
                        radius = ~effective_storage_capacity_109m3*10,
-                       group = "dams",
+                       group = "Depletion.Curve",
                        label = unique(damspat$reservoir_name)) %>%
-      addPopupGraphs(maps, group = "dams", width = 400, height = 300)
+      addPopupGraphs(maps, group = "Depletion.Curve", width = 400, height = 300) %>%
+      addCircleMarkers(data = damspat,
+                       lat = ~lat, lng = ~long,
+                       stroke = FALSE, fillOpacity = 0.65,
+                       radius = ~effective_storage_capacity_109m3*10,
+                       group = "Text.Info",
+                       label = unique(damspat$reservoir_name),
+                       popup = content) %>%
+      addLayersControl(baseGroups = c("Depletion.Curve", "Text.Info"),
+                       options = layersControlOptions(collapsed = FALSE),
+                       position = "topright") %>%
+      htmlwidgets::onRender("
+        function() {
+            $('.leaflet-control-layers-list').prepend('<label style=\"text-align:center\"><u>Toggle Popups</u></label>');
+        }
+    ")
     
       
   })
