@@ -6,6 +6,7 @@ library(leaflet)
 library(here)
 library(leaflet.extras)
 library(shinyWidgets)
+library(leafpop)
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -21,8 +22,11 @@ damspat <- read_csv(here("damspats.csv")) %>%
                                           "Irrigation & Water supply")),
          district = as_factor(district))
 
+load(here("popmaps.RData")) #this is called "maps" in the environment
+#because that's what it was called in leafpop.Rmd and somehow R knows
 
-#testing out plots
+
+#create static pieces
 content <- paste("<b>", damspat$reservoir_name, "</b></br>",
                  "River:", damspat$river, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
@@ -38,25 +42,6 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
                    radius = ~effective_storage_capacity_109m3*10, popup = content)
-
-grapher <- function(damname) {
-  data %>%
-    filter(date >= dmy(01012019),
-           reservoir_name == unique(damname)) %>%
-    ggplot(aes(x = date, y = storage_bcm)) +
-    geom_point(alpha = 0.8, 
-               fill = "#1BC0C2",
-               shape = 21,
-               size = 3) +
-    geom_line()+
-    labs(title = "Dam storage in 2019-2020",
-         x = "Date",
-         y = "Water Storage in BCM") +
-    theme_minimal()
-}
-
-
-maps <- map(unique(damspat$reservoir_name), grapher)
 
 
 
@@ -79,19 +64,10 @@ ui <- fluidPage(
                                     choices = levels(damdata$purpose),
                                     selected = levels(damdata$purpose)),
                  
-                 # pickerInput(inputId = "damtype2",
-                 #             label = "Dam use",
-                 #             choices = levels(damdata$purpose),
-                 #             selected = levels(damdata$purpose),
-                 #             options = list(`actions-box` = TRUE,
-                 #                            size = 10,
-                 #                            `selected-text-format` = "count > 3"),
-                 #             multiple = TRUE),
-                 
                  pickerInput(inputId = "damdist",
                              label = "District",
-                             choices = levels(damspat$district),
-                             selected = levels(damspat$district),
+                             choices = unique(damdata$district),
+                             selected = unique(damdata$district),
                              options = list(`actions-box` = TRUE,
                                             size = 10,
                                             `selected-text-format` = "count > 3"
@@ -128,7 +104,7 @@ server <- function(input, output){
   damreact <- reactive({
     damdata %>%
       filter(purpose %in% input$damtype, 
-            district %in% input$damdist,
+             district %in% input$damdist,
              date <= input$dates[2], date >= input$dates[1])
   })
   
@@ -159,7 +135,7 @@ server <- function(input, output){
   
   output$dateinfo <- renderText({
     "The data are at the monthly level and range from January 2015 to December 2020. 
-    We recommend subsetting by year and/or dam use to avoid overplotting."
+    We recommend subsetting the data to avoid overplotting."
   })
   
 
@@ -167,9 +143,10 @@ server <- function(input, output){
   output$plot <- renderPlot({
   
       ggplot(damreact(),
-             aes(x = date, y = storage_bcm, color = purpose,
-                 size = effective_storage_capacity_109m3)) +
-      geom_point(alpha = 0.6) +
+             aes(x = date, y = storage_bcm, color = purpose)) +
+      geom_point(alpha = 0.6,
+                 size = damreact()$effective_storage_capacity_109m3) +
+ #     geom_line(alpha = 0.6, group = damreact()$reservoir_name) +
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
            size = bquote("Effective storage capacity"~(10^9~m^3))) +

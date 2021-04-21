@@ -168,6 +168,9 @@ biggerdata <- left_join(biggerdata, dam_locations,
 sum(is.na(biggerdata$lat))
 sum(is.na(biggerdata$long))
 
+biggerdata <- biggerdata %>%
+  mutate(district = str_to_title(district))
+
 dam_spat <- biggerdata %>%
   select(-c(date, month, day, year,  x)) %>%
   distinct(reservoir_name, .keep_all = TRUE) %>%

@@ -4,20 +4,44 @@ output: pdf_document
 ---
 
 loading data and libraries
+
 ```{r}
 library(tidyverse)
-#install.packages("leafpop")
 library(leafpop)
 library(lubridate)
 library(leaflet)
-data <- read_csv("damdata.csv")
-damspat <- read_csv("damspats.csv")
+library(here)
 ```
+
+```{r}
+damdata <- read_csv(here("damdata.csv")) %>%
+  mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")))
+
+damspat <- read_csv(here("damspats.csv")) %>%
+  mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
+                                          "Irrigation",
+                                          "Irrigation & Hydroelectricity",
+                                          "Irrigation & Water supply")),
+         district = as_factor(district))
+```
+
+
+creating named titles
+
+```{r}
+damdata <- damdata %>%
+  mutate(lab = paste(reservoir_name, "dam water storage in 2019-2020"))
+```
+
+
 Starting leafpop graphs 
 
 ```{r}
 grapher <- function(damname) {
-  data %>%
+  damdata %>%
   filter(date >= dmy(01012019),
          reservoir_name == unique(damname)) %>%
   ggplot(aes(x = date, y = storage_bcm)) +
@@ -26,10 +50,11 @@ grapher <- function(damname) {
              shape = 21,
              size = 3) +
   geom_line()+
-  labs(title = "Dam storage in 2019-2020",
-       x = "Date",
-       y = "Water Storage in BCM") +
-  theme_minimal()
+  labs(title = "Dam water storage in 2019-2020",
+       subtitle = paste(unique(damname), "Dam"),
+       y = "Storage (BCM)") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank())
 }
 
 
@@ -39,6 +64,12 @@ maps <- map(unique(damspat$reservoir_name), grapher)
 
 
 ```{r}
+content <- paste("<b>", damspat$reservoir_name, "</b></br>",
+                 "River:", damspat$river, "</br>",
+                 "Purpose:", damspat$purpose, "</br>",
+                 "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
+
+
 leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
   setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
@@ -48,8 +79,14 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
                    radius = ~effective_storage_capacity_109m3*10,
-                   group = "dams") %>%
-  addPopupGraphs(maps, group = "dams", width = 300, height = 400)
+                   group = "dams",
+                   label = unique(damspat$reservoir_name)) %>%
+  addPopupGraphs(maps, group = "dams", width = 400, height = 300)
 
+```
+
+
+```{r}
+save(maps, file = here("popmaps.RData"))
 ```
 
