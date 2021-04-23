@@ -35,17 +35,17 @@ content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
 
 
 
+
 # User interface
 ui <- fluidPage(
-  titlePanel(title = "Dam daniel"),
+  titlePanel(title = "Dams and Droughts in Maharashtra"),
   tabsetPanel(
     tabPanel("Map", 
              
              sidebarLayout(
                position = "right",
                sidebarPanel(
-                 p("Here is where we will give context about the dams",
-                               "and monsoons.")
+                 uiOutput("information")
                ),
              
                mainPanel(
@@ -175,6 +175,40 @@ server <- function(input, output){
                          values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3"))
   })
 
+  
+output$information <- renderUI({
+HTML(paste("<b>", "The state of Maharashtra in India has more than 1200 dams, but it also has one 
+of the higher farmer suicide rates anywhere in the world. How is this possible?", "</b></br></br>",
+                            "<b>",  "The Monsoons", "</b></br>",
+                            "The monsoon season in the Indian subcontinent is a weather pattern that brings rain 
+to the subcontinent every year. The predominant monsoon winds enter the subcontinent 
+from the south west. Having travelled across the Indian Ocean, these winds carry with 
+them water saturated clouds", "</br> </br>",
+                            
+                            "<b>",  "The Western Ghats", "</b></br>",
+                            
+                            "The Western Ghats are a mountain range that runs down the western coast of the Indian Peninsula. 
+They act as a natural barrier that slows down the incoming monsoon winds and thus facilitate heavy 
+precipitation across the mountain range in the monsoon season. The precipitation is so great that 
+all of peninsular India's major rivers originate from a 50 km stretch of the northern 
+Western Ghats.", "</br", "</br>",
+                            
+                            "<b>",  "The Deccan Plateau", "</b></br>",
+                            "Once the monsoon winds cross the Western Ghats, they enter the Deccan plateau of central
+India where there are minimal physical barriers to slow down the winds. As a result, these 
+clouds do not deposit as much rain in this region until they slow down again as they approach 
+the Eastern Ghats, a comparatively minor mountain range on the eastern coast.", "</br </br>",
+                            
+                            "<b>",  "Drought", "</b></br>",
+                            
+                            "If the monsoons are not weak in a certain year, dams in the Western ghats still fill up more 
+and retain water for longer than those in the Deccan. As a result, this central region known 
+as Vidhabha is extremely drought prone. In drought years like 2018, the reservoirs of these 
+dams dry up as early as March. This is part of the reason that this region faces massive crop 
+failures which have ultimately led many farmers to take their own lives. 
+Climate change has made monsoons even more erratic which makes the threat to these communities 
+even more severe going into the future"))
+})
   
   output$credit <- renderUI({
     auth <- "Authors:"
