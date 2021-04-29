@@ -85,11 +85,11 @@ ui <- fluidPage(
              sidebarLayout(
                
                sidebarPanel(position = "right",
-                 p(h4("App authors:"),
+                 p(h4("App authors"),
                    "Aditya Gadkari", tags$br(),
                    "Lauren Rabe", tags$br(),
                    tags$br(),
-                   h4("Data sources:"),
+                   h4("Data sources"),
                    tags$a(href = "https://indiawris.gov.in/wris/#/", 
                           target = "_blank", 
                           "India Water Resources Information System"), tags$br(),
@@ -228,7 +228,7 @@ even more severe going into the future.", "</br> </br>"))
 
   
   output$adinfo <- renderUI({
-    HTML(paste("</br>", h4("Background on the data:"),
+    HTML(paste("</br>", h4("Background on the data"),
       "We noted that there were over 1,200 dams in Maharashtra, yet only provided data for 17 of them
       in our map and depletion curve graph. This is because these are the only dams for which we could
       get consistent water storage data. The Wikipedia article provided the dam characteristics in our 
