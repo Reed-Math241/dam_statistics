@@ -48,7 +48,6 @@ ui <- fluidPage(
                  leafletOutput("map", height = "500px"),
                  uiOutput("information"))
              
-             
              ),
     
     tabPanel("Plot", 
@@ -83,8 +82,26 @@ ui <- fluidPage(
              )),
 
     tabPanel("Info",
-             mainPanel(
-               uiOutput("credit"), uiOutput("link"), uiOutput("link2")
+             sidebarLayout(
+               
+               sidebarPanel(position = "right",
+                 p(h4("App authors:"),
+                   "Aditya Gadkari", tags$br(),
+                   "Lauren Rabe", tags$br(),
+                   tags$br(),
+                   h4("Data sources:"),
+                   tags$a(href = "https://indiawris.gov.in/wris/#/", 
+                          target = "_blank", 
+                          "India Water Resources Information System"), tags$br(),
+                   tags$a(href="https://en.wikipedia.org/wiki/List_of_dams_and_reservoirs_in_Maharashtra", 
+                          target = "_blank",
+                          "Wikipedia: List of dams and reservoirs in Maharashtra")
+                   )
+               ),
+               
+               mainPanel(
+                 uiOutput("adinfo")
+               )
              )
     )
   )
@@ -111,7 +128,7 @@ server <- function(input, output){
   
   
   output$map <- renderLeaflet({
-    leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
+    leaflet(options = leafletOptions(minZoom = 3, maxZoom = 10)) %>%
       addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
       setView(lat = 19.2, lng = 75, zoom = 7) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
@@ -209,30 +226,20 @@ even more severe going into the future.", "</br> </br>"))
 })
   
 
-
-  output$credit <- renderUI({
-    auth <- "App Authors:"
-    ad <- "Aditya Gadkari"
-    la <- "Lauren Rabe"
-    skip <- " "
-    sc <- "Data Sources:"
-    HTML(paste(auth, ad, la, skip, sc, sep = "</br>"))
+  
+  output$adinfo <- renderUI({
+    HTML(paste("</br>", h4("Background on the data:"),
+      "We noted that there were over 1,200 dams in Maharashtra, yet only provided data for 17 of them
+      in our map and depletion curve graph. This is because these are the only dams for which we could
+      get consistent water storage data. The Wikipedia article provided the dam characteristics in our 
+      Text.info map popups, and the Water Resources Information System (WRIS) provided the actual time 
+      series data of water storage within the dams. The WRIS reports this data at the yearly, monthly, 
+      and daily level; we found the monthly data to be the most helpful for understanding the Monsoon 
+      and drought seasons."))
   })
   
-  
-  output$link <- renderUI({
-    tags$a(href = "https://indiawris.gov.in/wris/#/", 
-           target = "_blank", 
-           "India Water Resources Information System")
-  })
-  
-  
-  output$link2 <- renderUI({
-    tags$a(href="https://en.wikipedia.org/wiki/List_of_dams_and_reservoirs_in_Maharashtra", 
-           target = "_blank",
-           "Wikipedia: List of dams and reservoirs in Maharashtra")
-  })
 }
+
 
 
 # Creates app
