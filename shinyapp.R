@@ -178,9 +178,10 @@ of the highest farmer suicide rates anywhere in the world. How is this possible?
            
                             "<b>",  "The Monsoons", "</b></br>",
                             "The monsoon season in the Indian subcontinent is a weather pattern that brings rain 
-to the subcontinent every year. The predominant monsoon winds enter the subcontinent 
-from the south west. Having travelled across the Indian Ocean, these winds carry with 
-them water-saturated clouds.", "</br> </br>",
+to the subcontinent every year, generally between June and September. The predominant monsoon winds enter the 
+subcontinent from the south west. Having travelled across the Indian Ocean, these winds carry with 
+them water-saturated clouds and deliver over 50% of India's total annual rainfall.", 
+"</br> </br>",
                             
                             "<b>",  "The Western Ghats", "</b></br>",
                             
@@ -198,8 +199,8 @@ the Eastern Ghats, a comparatively minor mountain range on the eastern coast.", 
                             
                             "<b>",  "Drought", "</b></br>",
                             
-                            "If the monsoons are weak in a certain year, dams in the Western Ghats still fill up more 
-and retain water for longer than those in the Deccan. As a result, this central region known 
+                            "Dams in the Western Ghats fill up more and retain water for longer than those in the Deccan,
+even if the monsoons are particularly weak in a certain year. As a result, this central region in the Deccan known 
 as Vidhabha is extremely drought prone. In drought years like 2018, the reservoirs of these 
 dams dry up as early as March. This is part of the reason that this region faces massive crop 
 failures which have ultimately led many farmers to take their own lives. 
@@ -210,11 +211,11 @@ even more severe going into the future.", "</br> </br>"))
 
 
   output$credit <- renderUI({
-    auth <- "Authors:"
+    auth <- "App Authors:"
     ad <- "Aditya Gadkari"
     la <- "Lauren Rabe"
     skip <- " "
-    sc <- "Sources:"
+    sc <- "Data Sources:"
     HTML(paste(auth, ad, la, skip, sc, sep = "</br>"))
   })
   
