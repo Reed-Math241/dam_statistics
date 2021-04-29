@@ -42,17 +42,13 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("Map", 
              
-             sidebarLayout(
-               position = "right",
-               sidebarPanel(
-                 uiOutput("information")
-               ),
-             
-               mainPanel(
+             verticalLayout(
+               
                  textOutput("title"),
-                 leafletOutput("map"))
+                 leafletOutput("map", height = "500px"),
+                 uiOutput("information"))
              
-             )
+             
              ),
     
     tabPanel("Plot", 
@@ -117,7 +113,7 @@ server <- function(input, output){
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
       addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
-      setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
+      setView(lat = 19.2, lng = 75, zoom = 7) %>%
       setMaxBounds(lat1 = 10, lng1 = 62.2,
                    lat2 = 29, lng2 = 90.2) %>%
       addCircleMarkers(data = damspat,
@@ -177,39 +173,42 @@ server <- function(input, output){
 
   
 output$information <- renderUI({
-HTML(paste("<b>", "The state of Maharashtra in India has more than 1200 dams, but it also has one 
-of the higher farmer suicide rates anywhere in the world. How is this possible?", "</b></br></br>",
+HTML(paste("<b>", h4("The state of Maharashtra in India has more than 1,200 dams, but it also has one 
+of the highest farmer suicide rates anywhere in the world. How is this possible?"), "</b>",
+           
                             "<b>",  "The Monsoons", "</b></br>",
                             "The monsoon season in the Indian subcontinent is a weather pattern that brings rain 
 to the subcontinent every year. The predominant monsoon winds enter the subcontinent 
 from the south west. Having travelled across the Indian Ocean, these winds carry with 
-them water saturated clouds", "</br> </br>",
+them water-saturated clouds.", "</br> </br>",
                             
                             "<b>",  "The Western Ghats", "</b></br>",
                             
-                            "The Western Ghats are a mountain range that runs down the western coast of the Indian Peninsula. 
+                            "The Western Ghats are a mountain range that run down the western coast of the Indian Peninsula. 
 They act as a natural barrier that slows down the incoming monsoon winds and thus facilitate heavy 
 precipitation across the mountain range in the monsoon season. The precipitation is so great that 
 all of peninsular India's major rivers originate from a 50 km stretch of the northern 
-Western Ghats.", "</br", "</br>",
+Western Ghats.", "</br>", "</br>",
                             
                             "<b>",  "The Deccan Plateau", "</b></br>",
                             "Once the monsoon winds cross the Western Ghats, they enter the Deccan plateau of central
 India where there are minimal physical barriers to slow down the winds. As a result, these 
 clouds do not deposit as much rain in this region until they slow down again as they approach 
-the Eastern Ghats, a comparatively minor mountain range on the eastern coast.", "</br </br>",
+the Eastern Ghats, a comparatively minor mountain range on the eastern coast.", "</br> </br>",
                             
                             "<b>",  "Drought", "</b></br>",
                             
-                            "If the monsoons are not weak in a certain year, dams in the Western ghats still fill up more 
+                            "If the monsoons are weak in a certain year, dams in the Western Ghats still fill up more 
 and retain water for longer than those in the Deccan. As a result, this central region known 
 as Vidhabha is extremely drought prone. In drought years like 2018, the reservoirs of these 
 dams dry up as early as March. This is part of the reason that this region faces massive crop 
 failures which have ultimately led many farmers to take their own lives. 
 Climate change has made monsoons even more erratic which makes the threat to these communities 
-even more severe going into the future"))
+even more severe going into the future.", "</br> </br>"))
 })
   
+
+
   output$credit <- renderUI({
     auth <- "Authors:"
     ad <- "Aditya Gadkari"
