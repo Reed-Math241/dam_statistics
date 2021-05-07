@@ -7,6 +7,7 @@ library(here)
 library(leaflet.extras)
 library(shinyWidgets)
 library(leafpop)
+library(waiter)
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -37,11 +38,19 @@ content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
-
+waiting_screen <- tagList(
+  img(src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Mahuli_Fort_From_Pivali_End.JPG/1200px-Mahuli_Fort_From_Pivali_End.JPG",
+      height=600,
+      id = "myImage"),
+  spin_flower(),
+  h4("Maharashtra Dam Statistics..."))
 
 
 # User interface
 ui <- fluidPage(
+  use_waiter(), 
+  waiter_preloader(),
+  
   titlePanel(title = "Dams and Droughts in Maharashtra"),
   tabsetPanel(
     tabPanel("Map", 
@@ -135,8 +144,11 @@ ui <- fluidPage(
     
     
 # Server function
-server <- function(input, output){
-
+server <- function(input, output,session){
+  
+  waiter_show(html = waiting_screen)
+  Sys.sleep(3) # do something that takes time
+  waiter_hide()
   
   damreact <- reactive({
     damdata %>%
