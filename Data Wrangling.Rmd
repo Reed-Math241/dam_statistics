@@ -173,18 +173,15 @@ biggerdata <- biggerdata %>%
          drought = case_when(
            long > 75 & long < 77 ~ "High drought risk",
            TRUE ~ "Low drought risk"
-         ))
+         )) %>%
+  unite(col = distlabel, c(district, drought), sep = " - ", remove = FALSE)
 
 dam_spat <- biggerdata %>%
   select(-c(date, month, day, year,  x)) %>%
   distinct(reservoir_name, .keep_all = TRUE) %>%
   mutate(gross_storage_capacity_103m3 = as.numeric(gross_storage_capacity_103m3),
          effective_storage_capacity_103m3 = as.numeric(effective_storage_capacity_103m3),
-         district = str_to_title(district),
-         drought = case_when(
-           long > 75 & long < 77 ~ "High drought risk",
-           TRUE ~ "Low drought risk"
-         ))
+         district = str_to_title(district))
 
 write_csv(biggerdata, here("damdata.csv"))
 write_csv(dam_spat, here("damspats.csv"))
