@@ -169,14 +169,22 @@ sum(is.na(biggerdata$lat))
 sum(is.na(biggerdata$long))
 
 biggerdata <- biggerdata %>%
-  mutate(district = str_to_title(district))
+  mutate(district = str_to_title(district),
+         drought = case_when(
+           long > 75 & long < 77 ~ "High drought risk",
+           TRUE ~ "Low drought risk"
+         ))
 
 dam_spat <- biggerdata %>%
   select(-c(date, month, day, year,  x)) %>%
   distinct(reservoir_name, .keep_all = TRUE) %>%
   mutate(gross_storage_capacity_103m3 = as.numeric(gross_storage_capacity_103m3),
          effective_storage_capacity_103m3 = as.numeric(effective_storage_capacity_103m3),
-         district = str_to_title(district))
+         district = str_to_title(district),
+         drought = case_when(
+           long > 75 & long < 77 ~ "High drought risk",
+           TRUE ~ "Low drought risk"
+         ))
 
 write_csv(biggerdata, here("damdata.csv"))
 write_csv(dam_spat, here("damspats.csv"))
@@ -187,14 +195,17 @@ playing around with the plot
 
 ```{r}
 
-data %>%
-  filter(purpose == "Irrigation & Hydroelectricity") %>%
+biggerdata %>%
+#  filter(purpose == "Irrigation & Hydroelectricity") %>%
+  filter(year %in% c(2015, 2016)) %>%
+  mutate(drought = fct_relevel(drought, c("Low drought risk", "High drought risk"))) %>%
   ggplot(aes(x = date, y = storage_bcm, color = purpose,
-             group = reservoir_name)) +
+             group = reservoir_name, shape = drought)) +
       geom_point(alpha = 0.6, aes(size = effective_storage_capacity_109m3))+
       geom_line(color = "black", alpha = 0.5)+
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
+           shape = "Drought risk",
            size = bquote("Effective storage capacity"~(10^9~m^3))) +
       theme(axis.title.x = element_blank()) +
       guides(color = guide_legend(order = 1),
