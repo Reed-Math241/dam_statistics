@@ -22,7 +22,8 @@ damspat <- read_csv(here("damspats.csv")) %>%
                                           "Irrigation & Hydroelectricity",
                                           "Irrigation & Water supply")),
          district = as_factor(district),
-         distlabel = as_factor(distlabel))
+         distlabel = as_factor(distlabel),
+         distlabel = fct_reorder2(distlabel, district, drought, last2))
 
 load(here("popmaps.RData")) #this is called "maps" in the environment
 #because that's what it was called in leafpop.Rmd and somehow R knows
@@ -71,7 +72,16 @@ ui <- fluidPage(
                  
                  pickerInput(inputId = "damdist",
                              label = "District",
-                             choices = unique(damdata$distlabel),
+                            # choices = levels(damdata$distlabel),
+                             choices = list(
+                               High_Risk = c("Jalgaon - High drought risk", "Parbhani - High drought risk",
+                                           "Pune - High drought risk", "Satara - High drought risk"),
+                               Low_Risk = c("Ahmadnagar - Low drought risk", "Aurangabad - Low drought risk",
+                                            "Hingoli - Low drought risk", "Kolhapur - Low drought risk",
+                                            "Nagpur - Low drought risk", "Nashik - Low drought risk",
+                                            "Pune - Low drought risk", "Satara - Low drought risk",
+                                            "Thane - Low drought risk")
+                             ),
                              selected = unique(damdata$distlabel),
                              options = list(`actions-box` = TRUE,
                                             size = 10,
@@ -86,7 +96,8 @@ ui <- fluidPage(
                  
                  p(h4("Drought years in Maharashtra:"),
                       "07/2015 - 07/2016", tags$br(),
-                      "07/2018 - 06/2019", tags$br()),
+                      "07/2018 - 06/2019", tags$br(),
+                      tags$br()),
                  textOutput("dateinfo")),
                
                mainPanel(
