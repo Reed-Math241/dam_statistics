@@ -8,6 +8,8 @@ library(leaflet.extras)
 library(shinyWidgets)
 library(leafpop)
 library(waiter)
+library(shinyBS)
+
 
 #load data
 damdata <- read_csv(here("damdata.csv")) %>%
@@ -23,8 +25,7 @@ damspat <- read_csv(here("damspats.csv")) %>%
                                           "Irrigation & Hydroelectricity",
                                           "Irrigation & Water supply")),
          district = as_factor(district),
-         distlabel = as_factor(distlabel),
-         distlabel = fct_reorder2(distlabel, district, drought, last2))
+         drought = as_factor(drought))
 
 load(here("popmaps.RData")) #this is called "maps" in the environment
 #because that's what it was called in leafpop.Rmd and somehow R knows
@@ -32,9 +33,8 @@ load(here("popmaps.RData")) #this is called "maps" in the environment
 
 #create static pieces
 content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
-                 damspat$drought, "</br>",
-                 damspat$river, "River", "</br>",
-                 damspat$district,"District",  "</br>",
+                 "River:", damspat$river, "</br>",
+                 "District:", damspat$district, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
@@ -43,7 +43,7 @@ waiting_screen <- tagList(
       height=600,
       id = "myImage"),
   spin_flower(),
-  h4("Maharashtra Dam Statistics..."))
+  h4("Loading Maharashtra Dam Statistics..."))
 
 
 # User interface
@@ -54,18 +54,19 @@ ui <- fluidPage(
   titlePanel(title = "Dams and Droughts in Maharashtra"),
   tabsetPanel(
     tabPanel("Map", 
-             
+    
              verticalLayout(
                
-                 p(tags$br(), h4(
+                 p(h4(
                  "This dashboard helps users compare the depletion rates of dams in high drought 
                    risk and low drought risk districts in the state of Maharashtra. Dams that are 
                    in the drought prone central region of the state run out of water much sooner than 
                    ones that are in the low drought risk mountains. Users can click on the dams in 
                    the map to view information about the particular dam or the depletion rate between 
                    2019 and 2021 (where 2019 was a drought year).")),
-                 p(tags$br(), "Maharashtra Dams"),
-                 leafletOutput("map", height = "500px"),
+                 
+                 leafletOutput("map", height = "550px"),
+                 
                  uiOutput("information"))
              
              ),
@@ -83,13 +84,13 @@ ui <- fluidPage(
                              label = "District",
                             # choices = levels(damdata$distlabel),
                              choices = list(
-                               High_Risk = c("Jalgaon - High drought risk", "Parbhani - High drought risk",
-                                           "Pune - High drought risk", "Satara - High drought risk"),
-                               Low_Risk = c("Ahmadnagar - Low drought risk", "Aurangabad - Low drought risk",
-                                            "Hingoli - Low drought risk", "Kolhapur - Low drought risk",
-                                            "Nagpur - Low drought risk", "Nashik - Low drought risk",
-                                            "Pune - Low drought risk", "Satara - Low drought risk",
-                                            "Thane - Low drought risk")
+                               `High risk districts` = c("Hingoli - High drought risk", "Jalgaon - High drought risk",
+                                                         "Parbhani - High drought risk", "Pune - High drought risk", 
+                                                         "Satara - High drought risk"),
+                               `Low risk districts` = c("Ahmadnagar - Low drought risk", "Aurangabad - Low drought risk",
+                                                        "Kolhapur - Low drought risk", "Nagpur - Low drought risk", 
+                                                        "Nashik - Low drought risk", "Pune - Low drought risk", 
+                                                        "Satara - Low drought risk", "Thane - Low drought risk")
                              ),
                              selected = unique(damdata$distlabel),
                              options = list(`actions-box` = TRUE,
@@ -114,7 +115,7 @@ ui <- fluidPage(
                  plotOutput("plot"))
              )),
 
-    tabPanel("Info",
+    tabPanel("Data",
              sidebarLayout(
                
                sidebarPanel(position = "right",
@@ -144,11 +145,13 @@ ui <- fluidPage(
     
     
 # Server function
-server <- function(input, output,session){
+server <- function(input, output, session){
   
   waiter_show(html = waiting_screen)
   Sys.sleep(3) # do something that takes time
   waiter_hide()
+
+  
   
   damreact <- reactive({
     damdata %>%
@@ -158,6 +161,8 @@ server <- function(input, output,session){
   })
   
   
+  dampal <- colorFactor(palette = c("#564040", "#0033FF"),
+                        domain = damspat$drought)
   
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 10)) %>%
@@ -168,6 +173,7 @@ server <- function(input, output,session){
       addCircleMarkers(data = damspat,
                        lat = ~lat, lng = ~long,
                        stroke = FALSE, fillOpacity = 0.65,
+                       color = ~dampal(drought),
                        radius = ~effective_storage_capacity_109m3*10,
                        group = "Depletion.Curve",
                        label = unique(damspat$reservoir_name)) %>%
@@ -175,10 +181,13 @@ server <- function(input, output,session){
       addCircleMarkers(data = damspat,
                        lat = ~lat, lng = ~long,
                        stroke = FALSE, fillOpacity = 0.65,
+                       color = ~dampal(drought),
                        radius = ~effective_storage_capacity_109m3*10,
                        group = "Text.Info",
                        label = unique(damspat$reservoir_name),
                        popup = content) %>%
+      addLegend(position = "bottomright", pal = dampal, values = damdata$drought,
+                opacity = 0.65) %>%
       addLayersControl(baseGroups = c("Depletion.Curve", "Text.Info"),
                        options = layersControlOptions(collapsed = FALSE),
                        position = "topright") %>%
@@ -220,7 +229,9 @@ server <- function(input, output,session){
                                     "Irrigation",
                                     "Irrigation & Hydroelectricity",
                                     "Irrigation & Water supply"),
-                         values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3"))
+                         values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3")) +
+      scale_shape_manual(breaks = c("Low drought risk", "High drought risk"),
+                         values = c(16, 17))
   })
 
   

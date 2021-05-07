@@ -26,7 +26,8 @@ damspat <- read_csv(here("damspats.csv")) %>%
                                           "Irrigation",
                                           "Irrigation & Hydroelectricity",
                                           "Irrigation & Water supply")),
-         district = as_factor(district))
+         district = as_factor(district),
+         drought = as_factor(drought))
 ```
 
 
@@ -96,6 +97,9 @@ save(maps, file = here("popmaps.RData"))
 trying to do multiple popups
 
 ```{r}
+dampal <- colorFactor(palette = c("#564040", "#0033FF"),
+                      domain = damspat$drought)
+
 leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
   setView(lat = 19.2, lng = 76.1, zoom = 7) %>%
@@ -104,6 +108,7 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addCircleMarkers(data = damspat,
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
+                   color = ~dampal(drought),
                    radius = ~effective_storage_capacity_109m3*10,
                    group = "Water.Depletion",
                    label = unique(damspat$reservoir_name)) %>%
@@ -111,6 +116,7 @@ leaflet(options = leafletOptions(minZoom = 3, maxZoom = 9)) %>%
   addCircleMarkers(data = damspat,
                    lat = ~lat, lng = ~long,
                    stroke = FALSE, fillOpacity = 0.65,
+                   color = ~dampal(drought),
                    radius = ~effective_storage_capacity_109m3*10,
                    group = "Text.Info",
                    label = unique(damspat$reservoir_name),
