@@ -44,13 +44,13 @@ ui <- fluidPage(
              
              verticalLayout(
                
-                 p(tags$br(),
+                 p(tags$br(),h4(
                  "This dashboard helps users compare the depletion rates of dams in high drought 
                    risk and low drought risk districts in the state of Maharashtra. Dams that are 
                    in the drought prone central region of the state run out of water much sooner than 
                    ones that are in the low drought risk mountains. Users can click on the dams in 
                    the map to view information about the particular dam or the depletion rate between 
-                   2019 and 2021 (where 2019 was a drought year)."),
+                   2019 and 2021 (where 2019 was a drought year).")),
                  textOutput("title"),
                  leafletOutput("map", height = "500px"),
                  uiOutput("information"))
@@ -81,6 +81,7 @@ ui <- fluidPage(
                                 start = as_date("2015-01-01"), end = as_date("2016-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
                  
+                
                  textOutput("dateinfo")),
                
                mainPanel(
