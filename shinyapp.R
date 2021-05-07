@@ -202,7 +202,8 @@ server <- function(input, output){
            size = bquote("Effective storage capacity"~(10^9~m^3))) +
       theme(axis.title.x = element_blank()) +
       guides(color = guide_legend(order = 1),
-             size = guide_legend(order = 2)) +
+             size = guide_legend(order = 2),
+             shape = guide_legend(order = 3)) +
       scale_color_manual(breaks = c("Hydroelectricity",
                                     "Irrigation",
                                     "Irrigation & Hydroelectricity",
