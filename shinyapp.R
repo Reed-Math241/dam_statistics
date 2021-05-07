@@ -13,14 +13,16 @@ damdata <- read_csv(here("damdata.csv")) %>%
   mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
                                           "Irrigation",
                                           "Irrigation & Hydroelectricity",
-                                          "Irrigation & Water supply")))
+                                          "Irrigation & Water supply")),
+         drought = fct_relevel(drought, c("Low drought risk", "High drought risk")))
 
 damspat <- read_csv(here("damspats.csv")) %>%
   mutate(purpose = fct_relevel(purpose, c("Hydroelectricity",
                                           "Irrigation",
                                           "Irrigation & Hydroelectricity",
                                           "Irrigation & Water supply")),
-         district = as_factor(district))
+         district = as_factor(district),
+         distlabel = as_factor(distlabel))
 
 load(here("popmaps.RData")) #this is called "maps" in the environment
 #because that's what it was called in leafpop.Rmd and somehow R knows
@@ -28,8 +30,9 @@ load(here("popmaps.RData")) #this is called "maps" in the environment
 
 #create static pieces
 content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
-                 "River:", damspat$river, "</br>",
-                 "District", damspat$district, "</br>",
+                 damspat$drought, "</br>",
+                 damspat$river, "River", "</br>",
+                 damspat$district,"District",  "</br>",
                  "Purpose:", damspat$purpose, "</br>",
                  "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
 
@@ -44,14 +47,14 @@ ui <- fluidPage(
              
              verticalLayout(
                
-                 p(tags$br(),h4(
+                 p(tags$br(), h4(
                  "This dashboard helps users compare the depletion rates of dams in high drought 
                    risk and low drought risk districts in the state of Maharashtra. Dams that are 
                    in the drought prone central region of the state run out of water much sooner than 
                    ones that are in the low drought risk mountains. Users can click on the dams in 
                    the map to view information about the particular dam or the depletion rate between 
                    2019 and 2021 (where 2019 was a drought year).")),
-                 textOutput("title"),
+                 p(tags$br(), "Maharashtra Dams"),
                  leafletOutput("map", height = "500px"),
                  uiOutput("information"))
              
@@ -68,8 +71,8 @@ ui <- fluidPage(
                  
                  pickerInput(inputId = "damdist",
                              label = "District",
-                             choices = unique(damdata$district),
-                             selected = unique(damdata$district),
+                             choices = unique(damdata$distlabel),
+                             selected = unique(damdata$distlabel),
                              options = list(`actions-box` = TRUE,
                                             size = 10,
                                             `selected-text-format` = "count > 3"
@@ -127,14 +130,10 @@ server <- function(input, output){
   damreact <- reactive({
     damdata %>%
       filter(purpose %in% input$damtype, 
-             district %in% input$damdist,
+             distlabel %in% input$damdist,
              date <= input$dates[2], date >= input$dates[1])
   })
   
-  
-  output$title <- renderText({
-    "Maharashtra Dams"
-  })
   
   
   output$map <- renderLeaflet({
@@ -182,7 +181,7 @@ server <- function(input, output){
   
       ggplot(damreact(),
              aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name,
-                 shape = fct_relevel(drought, c("Low drought risk", "High drought risk")))) +
+                 shape = drought)) +
       geom_point(alpha = 0.6,
                  size = damreact()$effective_storage_capacity_109m3*2) +
       geom_line(alpha = 0.2, color = "black") +
