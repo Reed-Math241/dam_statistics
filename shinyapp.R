@@ -44,12 +44,13 @@ ui <- fluidPage(
              
              verticalLayout(
                
-                 p("This dashboard helps users compare the depletion rates of dams in high drought 
+                 p(tags$br(),
+                 "This dashboard helps users compare the depletion rates of dams in high drought 
                    risk and low drought risk districts in the state of Maharashtra. Dams that are 
                    in the drought prone central region of the state run out of water much sooner than 
                    ones that are in the low drought risk mountains. Users can click on the dams in 
                    the map to view information about the particular dam or the depletion rate between 
-                   2019 and 2021 (where 2019 was a drought year)"),
+                   2019 and 2021 (where 2019 was a drought year)."),
                  textOutput("title"),
                  leafletOutput("map", height = "500px"),
                  uiOutput("information"))
@@ -177,12 +178,14 @@ server <- function(input, output){
   output$plot <- renderPlot({
   
       ggplot(damreact(),
-             aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name)) +
+             aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name,
+                 shape = fct_relevel(drought, c("Low drought risk", "High drought risk")))) +
       geom_point(alpha = 0.6,
                  size = damreact()$effective_storage_capacity_109m3*2) +
       geom_line(alpha = 0.2, color = "black") +
       theme_minimal() +
       labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
+           shape = "Drought risk",
            size = bquote("Effective storage capacity"~(10^9~m^3))) +
       theme(axis.title.x = element_blank()) +
       guides(color = guide_legend(order = 1),
