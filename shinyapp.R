@@ -81,7 +81,9 @@ ui <- fluidPage(
                                 start = as_date("2015-01-01"), end = as_date("2016-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
                  
-                
+                 p(h4("Drought years in Maharashtra:"),
+                      "07/2015 - 07/2016", tags$br(),
+                      "07/2018 - 06/2019", tags$br()),
                  textOutput("dateinfo")),
                
                mainPanel(
