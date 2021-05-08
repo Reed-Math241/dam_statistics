@@ -8,6 +8,7 @@ library(leaflet.extras)
 library(shinyWidgets)
 library(leafpop)
 library(waiter)
+library(shinyalert)
 library(shinyBS)
 
 
@@ -48,15 +49,25 @@ waiting_screen <- tagList(
 
 # User interface
 ui <- fluidPage(
-  use_waiter(), 
+  
+  use_waiter(),
   waiter_preloader(),
+
   
   titlePanel(title = "Dams and Droughts in Maharashtra"),
   tabsetPanel(
+    
+    
     tabPanel("Map", 
     
              verticalLayout(
                
+               useShinyalert(),
+               actionButton(
+                 inputId = "success",
+                 label = "Click me!"
+               ),
+        
                  p(h4(
                  "This dashboard helps users compare the depletion rates of dams in high drought 
                    risk and low drought risk districts in the state of Maharashtra. Dams that are 
@@ -147,10 +158,27 @@ ui <- fluidPage(
 # Server function
 server <- function(input, output, session){
   
+  
   waiter_show(html = waiting_screen)
   Sys.sleep(3) # do something that takes time
   waiter_hide()
 
+
+  observeEvent(input$success, {
+    shinyalert(
+      title = "Welcome!",
+      text = "This dashboard allows users to compare the depletion rates of dams in high drought
+              risk and low drought risk districts in the state of Maharashtra. Dams that are
+              in the drought prone central region of the state run out of water much sooner than
+              ones that are in the low drought risk mountains. Users can click on the dams in
+              the map tab to view information about the particular dam or the depletion rate between
+              2019 and 2021 (where 2019 was a drought year). In the plot tab, users can view the
+              depletion curves of many dams at once, for any dates between 2015 and 2021.",
+      confirmButtonText = "Let's go!",
+      immediate = TRUE
+    )
+  })
+  
   
   
   damreact <- reactive({
