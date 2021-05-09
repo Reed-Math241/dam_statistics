@@ -36,7 +36,8 @@ content <- paste("<b>", damspat$reservoir_name, "Dam", "</b></br>",
                  "River:", damspat$river, "</br>",
                  "District:", damspat$district, "</br>",
                  "Purpose:", damspat$purpose, "</br>",
-                 "Effective storage capacity:", damspat$effective_storage_capacity_109m3, "BCM")
+                 "Effective storage capacity:", 
+                 round(damspat$effective_storage_capacity_109m3, digits = 2), "BCM")
 
 waiting_screen <- tagList(
   img(src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Mahuli_Fort_From_Pivali_End.JPG/1200px-Mahuli_Fort_From_Pivali_End.JPG",
