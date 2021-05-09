@@ -1,0 +1,104 @@
+---
+title: "Final Project"
+subtitle: "Math 241"
+date: "Spring 2021"
+output: pdf_document
+urlcolor: blue
+---
+Aditya and Lauren
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Due: Tuesday May 11th at noon
+
+
+
+## Overall Goal
+
+The goal of this project is quite broad.  I want you to undertake a data science project that requires you to learn something new (e.g. new modeling technique, more advanced text analysis, a cool new R package, ...) and then create either a blog post or a web dashboard.
+
+## Project Tasks
+
+You will work in groups of 1-3 and will pick your own groups.  Please fill out the relevant group information [here](https://docs.google.com/spreadsheets/d/1lA4KYLbkxBBA57OoiuZgOL2cnYdTvb1JR7lzxy5xKUA/edit?usp=sharing).  Daily I will check the sheet and create project repos. 
+
+The following tasks should be done as a group:
+
+* Determine if you want to create a blog or a dashboard.
+* Determine the repo name.
+* Determine what new thing (e.g., method/concept/package) you want to learn.
+* Craft a research question.
+* Find a data source or sources that will help you answer your question.
+* Create one of the following:
+    + A dashboard [using either `flexdashboard` or `shinydashboard`](https://shiny.rstudio.com/articles/dashboards.html).  It should include enough text to achieve the project goals and requirements listed in the next section.
+    + Write a medium-long length (~ 1500 words +/ 500 words) blog post.
+* If you create a blog post, you will need to decide if you would like the post shared on the course blog.
+* If you create a dashboard, you will need to decide if you want to share it on the Reed Shiny Server.  (More info on that process later.)
+
+The following task should be completed **individually**:
+
+* Complete the [following feedback form](https://forms.gle/RgbooAZs3PWCnt9x7).
+
+## Guidance on Project Requirements/Goals
+
+Your final creation should attempt to achieve the following **goals**: 
+
++ Tell a story/seek to answer a question with data.
++ Be written in a colloquial style that is accessible to an educated non-expert or the general public.
+ 
+Since every data analysis is different and I want you to use your own creativity, I have tried to be fairly flexible in the requirements and require only the following:
+
++ Some data wrangling and/or web scraping
++ Some data visualizations and/or tables
++ **Something beyond what you have learned in class**
+    + A new data topic does not count.
+    + Exs:
+        + Modeling (beyond regression)
+        + New visualization method
+        + New data processing technique
+
+    
+
+
+
+## Data/Code
+
+* It is up to you whether or not you want to write tutorial style (with code included in the html).
+
+* Feel free to use whatever data you want.
+    + If you reuse a dataset you have already used as part of the class, make sure you are looking at it from a new angle.
+
+## Rubric
+
+I will grade the project by accessing it directly in your group GitHub repo.  Make sure it is clear what the final blog post or dashboard.
+
+
+When I assess your blog post, I will be looking for the following:
+
+* The items bulleted above for project goals and requirements
+* Appropriate data wrangling
+* Any data visualizations 
+    + Make appropriate use of geoms and their aesthetics
+    + Contain helpful context
+    + Are clear and engaging
+    + Support the text
+* Any tables are easy to read and support the text.
+* The text is well organized and well-written.
+* The code is appropriate, well organized and well-written.
+* I can follow the data story.
+* The post or dashboard is creative and engaging.
+* Any statistical arguments are clear and accurate.
+* Accurate conclusions are drawn from the analysis.
+* The writing is for a non-technical audience.
+* Sources are credited. 
+* Quality of the *new* component.
+
+
+## Due Dates
+
+* **Thursday, April 8th**: Sign up for group on the [Google Sheet](https://docs.google.com/spreadsheets/d/1lA4KYLbkxBBA57OoiuZgOL2cnYdTvb1JR7lzxy5xKUA/edit?usp=sharing).  Make sure to sign up even if you are working alone!
+
+* **Tuesday May 11th**: 
+    + Final product is due in your group repo by noon.
+    + [Feedback form](https://forms.gle/RgbooAZs3PWCnt9x7) should be completed by 1pm.
+
