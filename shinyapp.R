@@ -62,14 +62,18 @@ ui <- fluidPage(
     
              verticalLayout(
                
+               
                useShinyalert(),
               
-                 p(h4(
+               p(h4(
                  "Maharashtra Dams")),
                  
-                 leafletOutput("map", height = "550px"),
+               leafletOutput("map", height = "550px"),
+               
+               actionButton(inputId = "welcome",
+                            label = "Show welcome information again"),
                  
-                 uiOutput("information"))
+               uiOutput("information"))
              
              ),
     
@@ -300,12 +304,30 @@ even more severe going into the future.", "</br> </br>"))
               particular dam or the depletion rate across 2019 and 2020 
               (where 2019 was a drought year). In the plot tab, users can 
               view the depletion curves of many dams at once, for any 
-              months between 1/2015 and 12/2020.",
+              months between January 2015 and December 2020.",
       confirmButtonText = "Let's go!",
       immediate = TRUE
     )
   })
   
+  
+  observeEvent(input$welcome, {
+    shinyalert(
+      title = "Welcome, again!",
+      text = "This dashboard allows users to compare the depletion rates of 
+              dams in high drought risk and low drought risk districts in the 
+              state of Maharashtra. Dams that are in the drought prone 
+              central region of the state run out of water much sooner than 
+              ones that are in the low drought risk mountains. Users can 
+              click on the dams in the map tab to view information about the 
+              particular dam or the depletion rate across 2019 and 2020 
+              (where 2019 was a drought year). In the plot tab, users can 
+              view the depletion curves of many dams at once, for any 
+              months between January 2015 and December 2020.",
+      confirmButtonText = "Okay!",
+      immediate = TRUE
+    )
+  })
   
 }
 
