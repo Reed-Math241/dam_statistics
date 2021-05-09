@@ -63,19 +63,9 @@ ui <- fluidPage(
              verticalLayout(
                
                useShinyalert(),
-               actionButton(
-                 inputId = "welcome",
-                 label = "Click me!"
-               ),
-        
+              
                  p(h4(
-                 "This dashboard helps users compare the depletion rates of dams in high drought 
-                  risk and low drought risk districts in the state of Maharashtra. Dams that are 
-                  in the drought prone central region of the state run out of water much sooner than 
-                  ones that are in the low drought risk mountains. Users can click on the dams in 
-                  the map to view information about the particular dam or the depletion rate across
-                  2019 and 2020 (where 2019 was a drought year). In the plot tab, users can view the
-                  depletion curves of many dams at once, for any months between 1/2015 and 12/2020.")),
+                 "Maharashtra Dams")),
                  
                  leafletOutput("map", height = "550px"),
                  
@@ -165,25 +155,6 @@ server <- function(input, output, session){
   waiter_hide()
 
 
-  observeEvent(input$welcome, {
-    shinyalert(
-      title = "Welcome!",
-      text = "This dashboard allows users to compare the depletion rates of 
-              dams in high drought risk and low drought risk districts in the 
-              state of Maharashtra. Dams that are in the drought prone 
-              central region of the state run out of water much sooner than 
-              ones that are in the low drought risk mountains. Users can 
-              click on the dams in the map tab to view information about the 
-              particular dam or the depletion rate across 2019 and 2020 
-              (where 2019 was a drought year). In the plot tab, users can 
-              view the depletion curves of many dams at once, for any 
-              months between 1/2015 and 12/2020.",
-      confirmButtonText = "Let's go!",
-      immediate = TRUE
-    )
-  })
-  
-  
   
   damreact <- reactive({
     damdata %>%
@@ -314,6 +285,27 @@ even more severe going into the future.", "</br> </br>"))
       and daily level; we found the monthly data to be the most helpful for understanding the Monsoon 
       and drought seasons."))
   })
+  
+  
+  
+  observeEvent(waiter_preloader(), {
+    shinyalert(
+      title = "Welcome!",
+      text = "This dashboard allows users to compare the depletion rates of 
+              dams in high drought risk and low drought risk districts in the 
+              state of Maharashtra. Dams that are in the drought prone 
+              central region of the state run out of water much sooner than 
+              ones that are in the low drought risk mountains. Users can 
+              click on the dams in the map tab to view information about the 
+              particular dam or the depletion rate across 2019 and 2020 
+              (where 2019 was a drought year). In the plot tab, users can 
+              view the depletion curves of many dams at once, for any 
+              months between 1/2015 and 12/2020.",
+      confirmButtonText = "Let's go!",
+      immediate = TRUE
+    )
+  })
+  
   
 }
 
