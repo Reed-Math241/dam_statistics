@@ -9,7 +9,6 @@ library(shinyWidgets)
 library(leafpop)
 library(waiter)
 library(shinyalert)
-library(shinyBS)
 
 
 #load data
