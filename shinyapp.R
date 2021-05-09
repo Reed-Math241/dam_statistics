@@ -64,17 +64,18 @@ ui <- fluidPage(
                
                useShinyalert(),
                actionButton(
-                 inputId = "success",
+                 inputId = "welcome",
                  label = "Click me!"
                ),
         
                  p(h4(
                  "This dashboard helps users compare the depletion rates of dams in high drought 
-                   risk and low drought risk districts in the state of Maharashtra. Dams that are 
-                   in the drought prone central region of the state run out of water much sooner than 
-                   ones that are in the low drought risk mountains. Users can click on the dams in 
-                   the map to view information about the particular dam or the depletion rate between 
-                   2019 and 2021 (where 2019 was a drought year).")),
+                  risk and low drought risk districts in the state of Maharashtra. Dams that are 
+                  in the drought prone central region of the state run out of water much sooner than 
+                  ones that are in the low drought risk mountains. Users can click on the dams in 
+                  the map to view information about the particular dam or the depletion rate across
+                  2019 and 2020 (where 2019 was a drought year). In the plot tab, users can view the
+                  depletion curves of many dams at once, for any months between 1/2015 and 12/2020.")),
                  
                  leafletOutput("map", height = "550px"),
                  
@@ -95,13 +96,13 @@ ui <- fluidPage(
                              label = "District",
                             # choices = levels(damdata$distlabel),
                              choices = list(
-                               `High risk districts` = c("Hingoli - High drought risk", "Jalgaon - High drought risk",
-                                                         "Parbhani - High drought risk", "Pune - High drought risk", 
-                                                         "Satara - High drought risk"),
-                               `Low risk districts` = c("Ahmadnagar - Low drought risk", "Aurangabad - Low drought risk",
-                                                        "Kolhapur - Low drought risk", "Nagpur - Low drought risk", 
-                                                        "Nashik - Low drought risk", "Pune - Low drought risk", 
-                                                        "Satara - Low drought risk", "Thane - Low drought risk")
+                               `High risk areas` = c("Hingoli - High drought risk", "Jalgaon - High drought risk",
+                                                     "Parbhani - High drought risk", "Pune - High drought risk", 
+                                                     "Satara - High drought risk"),
+                               `Low risk areas` = c("Ahmadnagar - Low drought risk", "Aurangabad - Low drought risk",
+                                                    "Kolhapur - Low drought risk", "Nagpur - Low drought risk", 
+                                                    "Nashik - Low drought risk", "Pune - Low drought risk", 
+                                                    "Satara - Low drought risk", "Thane - Low drought risk")
                              ),
                              selected = unique(damdata$distlabel),
                              options = list(`actions-box` = TRUE,
@@ -164,16 +165,19 @@ server <- function(input, output, session){
   waiter_hide()
 
 
-  observeEvent(input$success, {
+  observeEvent(input$welcome, {
     shinyalert(
       title = "Welcome!",
-      text = "This dashboard allows users to compare the depletion rates of dams in high drought
-              risk and low drought risk districts in the state of Maharashtra. Dams that are
-              in the drought prone central region of the state run out of water much sooner than
-              ones that are in the low drought risk mountains. Users can click on the dams in
-              the map tab to view information about the particular dam or the depletion rate between
-              2019 and 2021 (where 2019 was a drought year). In the plot tab, users can view the
-              depletion curves of many dams at once, for any dates between 2015 and 2021.",
+      text = "This dashboard allows users to compare the depletion rates of 
+              dams in high drought risk and low drought risk districts in the 
+              state of Maharashtra. Dams that are in the drought prone 
+              central region of the state run out of water much sooner than 
+              ones that are in the low drought risk mountains. Users can 
+              click on the dams in the map tab to view information about the 
+              particular dam or the depletion rate across 2019 and 2020 
+              (where 2019 was a drought year). In the plot tab, users can 
+              view the depletion curves of many dams at once, for any 
+              months between 1/2015 and 12/2020.",
       confirmButtonText = "Let's go!",
       immediate = TRUE
     )
@@ -242,24 +246,23 @@ server <- function(input, output, session){
       ggplot(damreact(),
              aes(x = date, y = storage_bcm, color = purpose, group = reservoir_name,
                  shape = drought)) +
-      geom_point(alpha = 0.6,
-                 size = damreact()$effective_storage_capacity_109m3*2) +
-      geom_line(alpha = 0.2, color = "black") +
-      theme_minimal() +
-      labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
-           shape = "Drought risk",
-           size = bquote("Effective storage capacity"~(10^9~m^3))) +
-      theme(axis.title.x = element_blank()) +
-      guides(color = guide_legend(order = 1),
-             size = guide_legend(order = 2),
-             shape = guide_legend(order = 3)) +
-      scale_color_manual(breaks = c("Hydroelectricity",
-                                    "Irrigation",
-                                    "Irrigation & Hydroelectricity",
-                                    "Irrigation & Water supply"),
-                         values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3")) +
-      scale_shape_manual(breaks = c("Low drought risk", "High drought risk"),
-                         values = c(16, 17))
+        geom_point(alpha = 0.6,
+                   aes(size = damreact()$effective_storage_capacity_109m3)) +
+        geom_line(alpha = 0.2, color = "black") +
+        theme_minimal() +
+        labs(y = bquote("Water storage"~(10^9~m^3)), color = "Use",
+             shape = "Drought risk",
+             size = bquote("Effective storage capacity"~(10^9~m^3))) +
+        theme(axis.title.x = element_blank()) +
+        guides(color = guide_legend(order = 1),
+               size = guide_legend(order = 2)) +
+        scale_color_manual(breaks = c("Hydroelectricity",
+                                      "Irrigation",
+                                      "Irrigation & Hydroelectricity",
+                                      "Irrigation & Water supply"),
+                           values = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3")) +
+        scale_shape_manual(breaks = c("Low drought risk", "High drought risk"),
+                           values = c(16, 17))
   })
 
   
