@@ -59,9 +59,7 @@ ui <- fluidPage(
     
     
     tabPanel("Map", 
-    
              verticalLayout(
-               
                
                useShinyalert(),
               
@@ -76,6 +74,7 @@ ui <- fluidPage(
                uiOutput("information"))
              
              ),
+    
     
     tabPanel("Plot", 
              sidebarLayout(
@@ -128,6 +127,7 @@ ui <- fluidPage(
                  plotOutput("plot"))
              )),
 
+    
     tabPanel("Data",
              sidebarLayout(
                
@@ -175,8 +175,10 @@ server <- function(input, output, session){
   })
   
   
+  
   dampal <- colorFactor(palette = c("#564040", "#0033FF"),
                         domain = damspat$drought)
+  
   
   output$map <- renderLeaflet({
     leaflet(options = leafletOptions(minZoom = 3, maxZoom = 10)) %>%
@@ -211,7 +213,6 @@ server <- function(input, output, session){
         }
     ")
     
-      
   })
   
   
@@ -247,6 +248,7 @@ server <- function(input, output, session){
                            values = c(16, 17))
   })
 
+  
   
 output$information <- renderUI({
 HTML(paste("<b>", h4("The state of Maharashtra in India has more than 1,200 dams, but it also has one 
@@ -340,5 +342,5 @@ even more severe going into the future.", "</br> </br>"))
 
 
 
-# Creates app
+# Create app
 shinyApp(ui = ui, server = server)
