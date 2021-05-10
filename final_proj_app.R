@@ -98,7 +98,8 @@ ui <- fluidPage(
                                                     "Nashik - Low drought risk", "Pune - Low drought risk", 
                                                     "Satara - Low drought risk", "Thane - Low drought risk")
                              ),
-                             selected = unique(damdata$distlabel),
+                             selected = c("Satara - High drought risk", "Pune - High drought risk",
+                                          "Pune - Low drought risk", "Thane - Low drought risk"),
                              options = list(`actions-box` = TRUE,
                                             size = 10,
                                             `selected-text-format` = "count > 2"
@@ -110,11 +111,17 @@ ui <- fluidPage(
                                 start = as_date("2015-01-01"), end = as_date("2016-12-01"),
                                 min = as_date("2015-01-01"), max = as_date("2020-12-01")),
                  
-                 p(h4("Drought years in Maharashtra:"),
-                      "07/2015 - 07/2016", tags$br(),
-                      "07/2018 - 06/2019", tags$br(),
-                      tags$br()),
-                 textOutput("dateinfo")),
+                 textOutput("dateinfo"),
+                 
+                 p(tags$br(),
+                   h4("Drought years in Maharashtra:"),
+                   "07/2015 - 07/2016", tags$br(),
+                   "07/2018 - 06/2019", tags$br(),
+                   tags$br(),
+                   "Note how dams in high drought risk areas are more likely to
+                   run out of water, do so earlier in the year, and stay empty 
+                   for longer than dams in low drought risk areas.")
+                 ),
                
                mainPanel(
                  h3("Water storage over time"),
