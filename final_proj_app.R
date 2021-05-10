@@ -101,7 +101,7 @@ ui <- fluidPage(
                              selected = unique(damdata$distlabel),
                              options = list(`actions-box` = TRUE,
                                             size = 10,
-                                            `selected-text-format` = "count > 3"
+                                            `selected-text-format` = "count > 2"
                                             ),
                              multiple = TRUE),
                  
