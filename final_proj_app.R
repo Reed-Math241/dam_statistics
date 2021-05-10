@@ -47,6 +47,7 @@ waiting_screen <- tagList(
   h4("Loading Maharashtra Dam Statistics..."))
 
 
+
 # User interface
 ui <- fluidPage(
   
